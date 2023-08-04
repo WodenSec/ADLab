@@ -18,5 +18,10 @@ function Set-IPAddress {
     }
   }
 
-
-  
+function Invoke-DCSetup{
+    if($env:COMPUTERNAME -ne "DC01" ){
+        Write-Host("Changement de la configuration réseau, renommage du serveur en DC01 et redémarrage.")
+        Set-IPAddress
+        Rename-Computer -NewName "DC01" -Restart
+    }
+}
