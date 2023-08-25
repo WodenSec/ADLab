@@ -155,6 +155,8 @@ function Add-ServerContent{
     New-ADOrganizationalUnit -Name "Management" -Path "DC=wodensec,DC=local"
     New-ADOrganizationalUnit -Name "Consultants" -Path "DC=wodensec,DC=local"
     New-ADOrganizationalUnit -Name "Vente" -Path "DC=wodensec,DC=local"
+    New-ADOrganizationalUnit -Name "IT" -Path "DC=wodensec,DC=local"
+    New-ADOrganizationalUnit -Name "SVC" -Path "DC=wodensec,DC=local"
 
     foreach ($g in Get-ADGroup -Filter *){ Get-ADGroup $g | Move-ADObject -targetpath "OU=Groupes,DC=wodensec,DC=local" | Out-Null }
 
@@ -175,14 +177,32 @@ function Add-ServerContent{
     New-ADUser -Name "Lara Fournier" -GivenName "Lara" -Surname "Fournier" -SamAccountName "lfournier" -UserPrincipalName "lfournier@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "87cbzuvsF02&" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     New-ADUser -Name "Hugo Dupuy" -GivenName "Hugo" -Surname "Dupuy" -SamAccountName "hdupuy" -UserPrincipalName "hdupuy@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "X2w^vY432EoP" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
 
-
+    New-ADUser -Name "Guillaume Brazier" -GivenName "Guillaume" -Surname "Brazier" -SamAccountName "gbrazier" -Description "Désactivé le 25/08/2023" -UserPrincipalName "gbrazier@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "E&872JqMU5Lq" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
 
 
     New-ADUser -Name "Olivier Bossuet" -GivenName "Olivier" -Surname "Bossuet" -SamAccountName "obossuet" -UserPrincipalName "obossuet@wodensec.local" -Path "OU=vente,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "bxL!@2Me1M8u" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     New-ADUser -Name "Jessica Plantier" -GivenName "Jessica" -Surname "Plantier" -SamAccountName "jplantier" -UserPrincipalName "jplantier@wodensec.local" -Path "OU=vente,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "W0d3ns3c" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     New-ADUser -Name "Jade Schneider" -GivenName "Jade" -Surname "Schneider" -SamAccountName "jschneider" -UserPrincipalName "jschneider@wodensec.local" -Path "OU=vente,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Tzj044ZeV&Yu" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
 
+    
+    New-ADUser -Name "Arnaud Trottier" -GivenName "Arnaud" -Surname "Trottier" -SamAccountName "atrottier" -Description "Désactivé le 14/06/2023" -UserPrincipalName "atrottier@wodensec.local" -Path "OU=vente,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "E&872JqMU5Lq" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
 
+    New-ADUser -Name "Sylvain Cormier" -GivenName "Sylvain" -Surname "Cormier" -SamAccountName "scormier" -UserPrincipalName "scormier@wodensec.local" -Path "OU=IT,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "zL0T1N!4AAYr" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
+    New-ADUser -Name "Admin Sylvain Cormier" -GivenName "Admin" -Surname "Sylvain Cormier" -SamAccountName "adm-scormier" -UserPrincipalName "adm-scormier@wodensec.local" -Path "OU=IT,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "zL0T1N!4AAYrzL0T1N!4AAYr" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
+
+    New-ADUser -Name "Maxime Laurens" -GivenName "Maxime" -Surname "Laurens" -SamAccountName "mlaurens" -UserPrincipalName "mlaurens@wodensec.local" -Path "OU=IT,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Wodensec2024" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
+    New-ADUser -Name "Admin Maxime Laurens" -GivenName "Admin" -Surname "Maxime Laurens" -SamAccountName "adm-mlaurens" -UserPrincipalName "adm-mlaurens@wodensec.local" -Path "OU=IT,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "203cg1nSTo&p" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
+
+    Add-ADGroupMember -Identity "Admins du domaine" -Members adm-scormier
+    Add-ADGroupMember -Identity "Admins du domaine" -Members adm-mlaurens
+
+    New-ADUser -Name "svc-sql" -GivenName "svc" -Surname "sql" -SamAccountName "svc-sql" -Description "Compte de service SQL" -UserPrincipalName "svc-sql@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "sql0v3-u" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount -PassThru  | Out-Null
+
+    New-ADUser -Name "svc-backup" -GivenName "svc" -Surname "backup" -SamAccountName "svc-backup" -Description "Compte de service backup. Mdp: B4ckup-S3rv1c3" -UserPrincipalName "svc-backup@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "B4ckup-S3rv1c3" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
+
+    setspn -A DC01/svc-sql.wodensec.local:`60111 wodensec\svc-sql > $null
+    setspn -A svc-sql/wodensec.local wodensec\svc-sql > $null
+    setspn -A DomainController/svc-sql.wodensec.local:`60111 wodensec\svc-sql > $null
 }
 
 
