@@ -1,6 +1,7 @@
 function Set-PC01 { 
 
-  if ($machine -ne "PC01") { 
+
+  if ($env:COMPUTERNAME -ne "PC01") { 
     write-host ("`n Setting the name of this machine to PC01 and rebooting automatically...")
 
     # Remove updates
@@ -17,7 +18,7 @@ function Set-PC01 {
 
 
     }
-    elseif ($machine -eq "PC01") {
+    elseif ($env:COMPUTERNAME -eq "PC01") {
 
     $NetAdapter=Get-CimInstance -Class Win32_NetworkAdapter -Property NetConnectionID,NetConnectionStatus | Where-Object { $_.NetConnectionStatus -eq 2 } | Select-Object -Property NetConnectionID -ExpandProperty NetConnectionID
     $IPAddress=Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias $NetAdapter | Select-Object -ExpandProperty IPAddress
