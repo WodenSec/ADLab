@@ -359,7 +359,7 @@ function Invoke-DCSetup{
     }elseif($env:USERDNSDOMAIN -ne "WODENSEC.LOCAL"){
         Write-Host("Deuxième execution detectée. Installation des rôles...")
         Build-Server
-    }elseif($env:COMPUTERNAME -ne "DC01" -and $env:USERDNSDOMAIN -ne "WODENSEC.LOCAL"){
+    }elseif($env:COMPUTERNAME -eq "DC01" -and $env:USERDNSDOMAIN -eq "WODENSEC.LOCAL"){
         Write-Host("Troisième execution detectée. Ajout du contenu...")
         Add-ServerContent
 
