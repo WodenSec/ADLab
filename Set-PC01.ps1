@@ -83,16 +83,6 @@ function Set-PC01 {
     Wait-Process wusa 
     Start-Sleep -s 1 }
 
-
-
-    Rename-Computer -NewName "PC01" -Restart
-
-
-    }
-    elseif ($env:COMPUTERNAME -eq "PC01") {
-
-    Nuke-Defender
-
     $NetAdapter=Get-CimInstance -Class Win32_NetworkAdapter -Property NetConnectionID,NetConnectionStatus | Where-Object { $_.NetConnectionStatus -eq 2 } | Select-Object -Property NetConnectionID -ExpandProperty NetConnectionID
     $IPAddress=Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias $NetAdapter | Select-Object -ExpandProperty IPAddress
     $IPByte = $IPAddress.Split(".")
@@ -103,6 +93,16 @@ function Set-PC01 {
     Disable-NetAdapterPowerManagement -Name "$NetAdapter"
 
     netsh interface ipv6 set dnsservers "$NetAdapter" dhcp
+
+    Rename-Computer -NewName "PC01" -Restart
+
+
+    }
+    elseif ($env:COMPUTERNAME -eq "PC01") {
+
+    Nuke-Defender
+
+
 
         write-host("`n Joining machine to domain wodensec.local")
       $domain = "WODENSEC"
