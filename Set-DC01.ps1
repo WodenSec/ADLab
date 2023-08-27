@@ -1,16 +1,17 @@
 #Requires -RunAsAdministrator
 
 function Set-IPAddress {
+
+    # Get info: adapter, IP, gateway
     $NetAdapter=Get-CimInstance -Class Win32_NetworkAdapter -Property NetConnectionID,NetConnectionStatus | Where-Object { $_.NetConnectionStatus -eq 2 } | Select-Object -Property NetConnectionID -ExpandProperty NetConnectionID
     $IPAddress=Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias $NetAdapter | Select-Object -ExpandProperty IPAddress
     $NetM
     $Gateway=((Get-NetIPConfiguration -InterfaceAlias $NetAdapter).IPv4DefaultGateway).NextHop
-
-    # split the ip address up based on the . 
     $IPByte = $IPAddress.Split(".")
-    # first 2 octets of ip address only 
+
+    # Check IP and set static
     if ($IPByte[0] -eq "169" -And $IPByte[1] -eq "254") {
-        Write-Host("`n [ ERROR ] - $IPaddress is a LinkLocal Adress, Check your Hypervisor configuration `n`n")
+        Write-Host("`n [ ERREUR ] - $IPaddress est une adresse Link-Local, paramètre réseau de la VM à vérifier. `n`n")
         exit
     }else{
         $StaticIP = ($IPByte[0]+"."+$IPByte[1]+"."+$IPByte[2]+".250")
@@ -38,7 +39,7 @@ function Nuke-Defender{
     Set-MpPreference -DisableRestorePoint  $true | Out-Null
     Set-MpPreference -DisableScanningMappedNetworkDrivesForFullScan  $true | Out-Null
     Set-MpPreference -DisableScanningNetworkFiles  $true | Out-Null
-     Set-MpPreference -DisableScriptScanning $true | Out-Null
+    Set-MpPreference -DisableScriptScanning $true | Out-Null
 
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /f /v EnableLUA /t REG_DWORD /d 0 > $null
     reg add "HKLM\System\CurrentControlSet\Services\SecurityHealthService" /v "Start" /t REG_DWORD /d "4" /f > $null  
@@ -63,10 +64,10 @@ function Nuke-Defender{
     schtasks /Change /TN "Microsoft\Windows\Windows Defender\Windows Defender Cleanup" /Disable > $null
     schtasks /Change /TN "Microsoft\Windows\Windows Defender\Windows Defender Scheduled Scan" /Disable > $null
     schtasks /Change /TN "Microsoft\Windows\Windows Defender\Windows Defender Verification" /Disable > $null
-
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v "NoAutoUpdate" /t REG_DWORD /d "1" /f > $nul
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "LocalAccountTokenFilterPolicy" /t REG_DWORD /d "1" /f > $null
 
+    # Firewall rules
     Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False | Out-Null
     Get-NetFirewallRule -Group '@FirewallAPI.dll,-32752'|Set-NetFirewallRule -Profile 'Private, Domain' -Enabled true -PassThru|select Name,DisplayName,Enabled,Profile |ft -a | Out-Null
     netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow > $null
@@ -80,7 +81,7 @@ function Nuke-Defender{
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "NoWarningNoElevationOnInstall" /t REG_DWORD /d "1" /f > $null
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "RestrictDriverInstallationToAdministrators" /t REG_DWORD /d "0" /f > $null
 
-
+    # Uninstall updates
     Get-WmiObject -query "Select HotFixID  from Win32_QuickFixengineering" | sort-object -Descending -Property HotFixID|%{
     $sUpdate=$_.HotFixID.Replace("KB","")
     write-host ("Uninstalling update "+$sUpdate);
@@ -91,11 +92,11 @@ function Nuke-Defender{
 }
 
 function Get-QoL{
-    write-host("`n  [++] Quality of life improvement - Dark Theme")
+    write-host("`n  [++] QoL - Thème sombre")
     reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "AppsUseLightTheme" /t REG_DWORD /d "0" /f > $null
     reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "SystemUsesLightTheme" /t REG_DWORD /d "0" /f > $null
 
-    write-host("`n  [++] Quality of life improvement - Disable ScreenSaver, ScreenLock and Timeout")
+    write-host("`n  [++] QoL - Verrouillage session, mise en veille désactivée")
     reg add  "HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Control Panel\Desktop" /v "ScreenSaveTimeOut" /t REG_DWORD /d "0" /f > $null 
     reg add  "HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Control Panel\Desktop" /v "ScreenSaveActive" /t REG_DWORD /d "0" /f > $null
     reg add  "HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Control Panel\Desktop" /v "ScreenSaverIsSecure" /t REG_DWORD /d "0" /f > $null
@@ -103,54 +104,57 @@ function Get-QoL{
     Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask | Out-Null
 }
 
+function Add-User{
+    param(
+        [Parameter()][string]$prenom,
+        [Parameter()][string]$nom,
+        [Parameter()][string]$sam,
+        [Parameter()][string]$ou,
+        [Parameter()][string]$mdp
+    )
+
+    $mdp = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String($mdp))
+    New-ADUser -Name "$prenom $nom" -GivenName "$prenom" -Surname "$nom" -SamAccountName "$sam" -UserPrincipalName "$sam@wodensec.local" -Path "OU=$ou,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString $mdp -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
+}
+
 function Build-Server{
-    write-host("`n  [++] Installing Module Active Directory Domain Services (ADDS)")
+    write-host("`n  [++] Installation de Active Directory Domain Services (ADDS)")
     Install-windowsfeature -name AD-Domain-Services -IncludeManagementTools -WarningAction SilentlyContinue | Out-Null
 
     write-host("`n  [++] Importing Module ActiveDirectory")
     Import-Module ActiveDirectory -WarningAction SilentlyContinue | Out-Null
 
-    write-host("`n  [++] Installing ADDS Domain : wodensec.local ")
+    write-host("`n  [++] Installation du domaine: wodensec.local ")
     Install-ADDSDomain -SkipPreChecks -ParentDomainName WODENSEC -NewDomainName local -NewDomainNetbiosName WODENSEC -InstallDns -SafeModeAdministratorPassword (Convertto-SecureString -AsPlainText "R00tR00t" -Force) -Force -WarningAction SilentlyContinue | Out-Null
 
-    write-host("`n  [++] Deploying Active Directory Domain Forest in wodensec.local")
+    write-host("`n  [++] Déploiement de la forêt AD dans wodensec.local")
     Install-ADDSForest -SkipPreChecks -CreateDnsDelegation:$false -DatabasePath "C:\Windows\NTDS" -DomainMode "WinThreshold" -DomainName "WODENSEC.local" -DomainNetbiosName "WODENSEC" -ForestMode "WinThreshold" -InstallDns:$true -LogPath "C:\Windows\NTDS" -NoRebootOnCompletion:$false -SysvolPath "C:\Windows\SYSVOL" -Force:$true -SafeModeAdministratorPassword (Convertto-SecureString -AsPlainText "R00tR00t" -Force) -WarningAction SilentlyContinue | Out-Null
 
 }
 
 function Add-ServerContent{
 
-    # install ad-certificate services
-    write-host("`n  [++] Installing Active Directory Certificate Services")
+    write-host("`n  [++] Installation de AD Certificate Services")
     Add-WindowsFeature -Name AD-Certificate -IncludeManagementTools -WarningAction SilentlyContinue | Out-Null
   
-    # install ad-certificate authority
-    write-host("`n  [++] Installing Active Directory Certificate Authority")
+    write-host("`n  [++] Installation de ADCS Certificate Authority")
     Add-WindowsFeature -Name Adcs-Cert-Authority -IncludeManagementTools -WarningAction SilentlyContinue | Out-Null
 
-    # configure ad-certificate authority
-    write-host("`n  [++] Configuring Active Directory Certificate Authority")
+    write-host("`n  [++] Configuration de Active Directory Certificate Authority")
+    Install-AdcsCertificationAuthority -CAType EnterpriseRootCa -CryptoProviderName "RSA#Microsoft Software Key Storage Provider" -KeyLength 2048 -HashAlgorithmName SHA1 -ValidityPeriod Years -ValidityPeriodUnits 99 -WarningAction SilentlyContinue -Force | Out-Null
 
-    # fix_adcsca
-    Install-AdcsCertificationAuthority -CAType EnterpriseRootCa -CryptoProviderName "RSA#Microsoft Software Key Storage Provider" `
-    -KeyLength 2048 -HashAlgorithmName SHA1 -ValidityPeriod Years -ValidityPeriodUnits 99 -WarningAction SilentlyContinue -Force | Out-Null
-
-    # install remote system administration tools
-    write-host("`n  [++] Installing Remote System Administration Tools (RSAT)")
+    write-host("`n  [++] Installation de Remote System Administration Tools (RSAT)")
     Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0 -WarningAction SilentlyContinue | Out-Null
 
-    # install rsat-adcs and rsat-adcs-management 
-    write-host("`n  [++] Installing RSAT-ADCS and RSAT-ADCS-Management")
+    write-host("`n  [++] Installation de RSAT-ADCS et RSAT-ADCS-Management")
     Add-WindowsFeature RSAT-ADCS,RSAT-ADCS-mgmt -WarningAction SilentlyContinue | Out-Null
 
 
-
-
+    # Groupes, OUs, utilisateurs
     New-ADGroup -name "RH" -GroupScope Global
     New-ADGroup -name "Management" -GroupScope Global
     New-ADGroup -name "Consultants" -GroupScope Global
     New-ADGroup -name "Vente" -GroupScope Global
-
 
     New-ADOrganizationalUnit -Name "Groupes" -Path "DC=wodensec,DC=local"
     New-ADOrganizationalUnit -Name "RH" -Path "DC=wodensec,DC=local"
@@ -162,51 +166,62 @@ function Add-ServerContent{
 
     foreach ($g in Get-ADGroup -Filter *){ Get-ADGroup $g | Move-ADObject -targetpath "OU=Groupes,DC=wodensec,DC=local" | Out-Null }
 
-    New-ADUser -Name "Richard Cuvillier" -GivenName "Richard" -Surname "Cuvillier" -SamAccountName "rcuvillier" -UserPrincipalName "rcuvillier@wodensec.local" -Path "OU=management,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Wodensec123" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "Basile Delacroix" -GivenName "Basile" -Surname "Delacroix" -SamAccountName "bdelacroix" -UserPrincipalName "bdelacroix@wodensec.local" -Path "OU=management,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Azerty#15" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "Martine Baudet" -GivenName "Martine" -Surname "Baudet" -SamAccountName "mbaudet" -UserPrincipalName "mbaudet@wodensec.local" -Path "OU=management,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "67D1fD%%k8r8" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
+    # Management
+    Add-User -prenom "Richard" -nom "Cuvillier" -sam "rcuvillier" -ou "management" -mdp "VwBvAGQAZQBuAHMAZQBjADEAMgAzAA=="
+    Add-User -prenom "Basile" -nom "Delacroix" -sam "bdelacroix" -ou "management" -mdp "QQB6AGUAcgB0AHkAIwAxADUA"
+    Add-User -prenom "Martine" -nom "Baudet" -sam "mbaudet" -ou "management" -mdp "NgA3AEQAMQBmAEQAJQAlAGsAOAByADgA"
 
-    New-ADUser -Name "Louise Chappuis" -GivenName "Louise" -Surname "Chappuis" -SamAccountName "lchappuis" -UserPrincipalName "lchappuis@wodensec.local" -Path "OU=rh,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Azerty123" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "Sarah Meyer" -GivenName "Sarah" -Surname "Meyer" -SamAccountName "smeyer" -UserPrincipalName "smeyer@wodensec.local" -Path "OU=rh,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Wodensec2024!" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
+    # RH
+    Add-User -prenom "Louise" -nom "Chappuis" -sam "lchappuis" -ou "rh" -mdp "QQB6AGUAcgB0AHkAMQAyADMA"
+    Add-User -prenom "Sarah" -nom "Meyer" -sam "smeyer" -ou "rh" -mdp "VwBvAGQAZQBuAHMAZQBjADIAMAAyADQAIQA="
 
-    New-ADUser -Name "Henri Walter" -GivenName "Henri" -Surname "Walter" -SamAccountName "hwalter" -UserPrincipalName "hwalter@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Wodensec*98" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "Bertrand Dubois" -GivenName "Bertrand" -Surname "Dubois" -SamAccountName "bdubois" -UserPrincipalName "bdubois@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "KiLlEr5!" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "Didier Leroux" -GivenName "Didier" -Surname "Leroux" -SamAccountName "dleroux" -UserPrincipalName "dleroux@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "ZoraRose91!" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "Pascal Mesny" -GivenName "Pascal" -Surname "Mesny" -SamAccountName "pmesny" -UserPrincipalName "pmesny@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "ws9pA&lg7N32" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
+    # Consultants
+    Add-User -prenom "Henri" -nom "Walter" -sam "hwalter" -ou "consultants" -mdp "VwBvAGQAZQBuAHMAZQBjACoAOQA4AA=="
+    Add-User -prenom "Bertrand" -nom "Dubois" -sam "bdubois" -ou "consultants" -mdp "SwBpAEwAbABFAHIANQAhAA=="
+    Add-User -prenom "Didier" -nom "Leroux" -sam "dleroux" -ou "consultants" -mdp "WgBvAHIAYQBSAG8AcwBlADkAMQAhAA=="
+    Add-User -prenom "Pascal" -nom "Mesny" -sam "pmesny" -ou "consultants" -mdp "dwBzADkAcABBACYAbABnADcATgAzADIA"
+
+
+    Add-User -prenom "Louise" -nom "Chappuis" -sam "lchappuis" -ou "consultants" -mdp "QQB6AGUAcgB0AHkAMQAyADMA"
+    Add-User -prenom "Sarah" -nom "Meyer" -sam "smeyer" -ou "consultants" -mdp "VwBvAGQAZQBuAHMAZQBjADIAMAAyADQAIQA="
+    Add-User -prenom "Louise" -nom "Chappuis" -sam "lchappuis" -ou "consultants" -mdp "QQB6AGUAcgB0AHkAMQAyADMA"
+    Add-User -prenom "Sarah" -nom "Meyer" -sam "smeyer" -ou "consultants" -mdp "VwBvAGQAZQBuAHMAZQBjADIAMAAyADQAIQA="
+
+   New-ADUser -Name "Pascal Mesny" -GivenName "Pascal" -Surname "Mesny" -SamAccountName "pmesny" -UserPrincipalName "pmesny@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "ws9pA&lg7N32" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     New-ADUser -Name "Lydia Beaumont" -GivenName "Lydia" -Surname "Beaumont" -SamAccountName "lbeaumont" -UserPrincipalName "lbeaumont@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "T0ki0H0t3l" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     New-ADUser -Name "Alexia Chabert" -GivenName "Alexia" -Surname "Chabert" -SamAccountName "achabert" -UserPrincipalName "achabert@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "POiu*&87^%" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     New-ADUser -Name "Dylan Brassard" -GivenName "Dylan" -Surname "Brassard" -SamAccountName "dbrassard" -UserPrincipalName "dbrassard@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Ksdi3426C&ve" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     New-ADUser -Name "Lara Fournier" -GivenName "Lara" -Surname "Fournier" -SamAccountName "lfournier" -UserPrincipalName "lfournier@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "87cbzuvsF02&" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     New-ADUser -Name "Hugo Dupuy" -GivenName "Hugo" -Surname "Dupuy" -SamAccountName "hdupuy" -UserPrincipalName "hdupuy@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "X2w^vY432EoP" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
 
-    New-ADUser -Name "Guillaume Brazier" -GivenName "Guillaume" -Surname "Brazier" -SamAccountName "gbrazier" -Description "Désactivé le 25/08/2023" -UserPrincipalName "gbrazier@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "E&872JqMU5Lq" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
-
-
+    # Vente
     New-ADUser -Name "Olivier Bossuet" -GivenName "Olivier" -Surname "Bossuet" -SamAccountName "obossuet" -UserPrincipalName "obossuet@wodensec.local" -Path "OU=vente,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "bxL!@2Me1M8u" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     New-ADUser -Name "Jessica Plantier" -GivenName "Jessica" -Surname "Plantier" -SamAccountName "jplantier" -UserPrincipalName "jplantier@wodensec.local" -Path "OU=vente,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "W0d3ns3c" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     New-ADUser -Name "Jade Schneider" -GivenName "Jade" -Surname "Schneider" -SamAccountName "jschneider" -UserPrincipalName "jschneider@wodensec.local" -Path "OU=vente,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Tzj044ZeV&Yu" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-
     
-    New-ADUser -Name "Arnaud Trottier" -GivenName "Arnaud" -Surname "Trottier" -SamAccountName "atrottier" -Description "Désactivé le 14/06/2023" -UserPrincipalName "atrottier@wodensec.local" -Path "OU=vente,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "E&872JqMU5Lq" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
-
+    # Comptes IT et comptes IT admins du domaine
     New-ADUser -Name "Sylvain Cormier" -GivenName "Sylvain" -Surname "Cormier" -SamAccountName "scormier" -UserPrincipalName "scormier@wodensec.local" -Path "OU=IT,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "zL0T1N!4AAYr" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     New-ADUser -Name "Admin Sylvain Cormier" -GivenName "Admin" -Surname "Sylvain Cormier" -SamAccountName "adm-scormier" -UserPrincipalName "adm-scormier@wodensec.local" -Path "OU=IT,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "zL0T1N!4AAYrzL0T1N!4AAYr" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-
     New-ADUser -Name "Maxime Laurens" -GivenName "Maxime" -Surname "Laurens" -SamAccountName "mlaurens" -UserPrincipalName "mlaurens@wodensec.local" -Path "OU=IT,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Wodensec2024" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     New-ADUser -Name "Admin Maxime Laurens" -GivenName "Admin" -Surname "Maxime Laurens" -SamAccountName "adm-mlaurens" -UserPrincipalName "adm-mlaurens@wodensec.local" -Path "OU=IT,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "203cg1nSTo&p" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-
     Add-ADGroupMember -Identity "Admins du domaine" -Members adm-scormier
     Add-ADGroupMember -Identity "Admins du domaine" -Members adm-mlaurens
 
-    New-ADUser -Name "svc-sql" -GivenName "svc" -Surname "sql" -SamAccountName "svc-sql" -Description "Compte de service SQL" -UserPrincipalName "svc-sql@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "sql0v3-u" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount -PassThru  | Out-Null
+    # Quelques comptes désactivés
+    New-ADUser -Name "Arnaud Trottier" -GivenName "Arnaud" -Surname "Trottier" -SamAccountName "atrottier" -Description "Désactivé le 14/06/2023" -UserPrincipalName "atrottier@wodensec.local" -Path "OU=vente,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "E&872JqMU5Lq" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
+    New-ADUser -Name "Guillaume Brazier" -GivenName "Guillaume" -Surname "Brazier" -SamAccountName "gbrazier" -Description "Désactivé le 25/08/2023" -UserPrincipalName "gbrazier@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "E&872JqMU5Lq" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
 
+
+
+    # Comptes de service et SPN
+    New-ADUser -Name "installpc" -GivenName "install" -Surname "pc" -SamAccountName "installpc" -Description "Compte d'installation PC." -UserPrincipalName "installpc@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Superadministrat0r!" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
+    New-ADUser -Name "svc-sql" -GivenName "svc" -Surname "sql" -SamAccountName "svc-sql" -Description "Compte de service SQL" -UserPrincipalName "svc-sql@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "sql0v3-u" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount -PassThru  | Out-Null
     New-ADUser -Name "svc-backup" -GivenName "svc" -Surname "backup" -SamAccountName "svc-backup" -Description "Compte de service backup. Mdp: B4ckup-S3rv1c3" -UserPrincipalName "svc-backup@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "B4ckup-S3rv1c3" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
 
     setspn -A DC01/svc-sql.wodensec.local:`60111 wodensec\svc-sql > $null
     setspn -A svc-sql/wodensec.local wodensec\svc-sql > $null
     setspn -A DomainController/svc-sql.wodensec.local:`60111 wodensec\svc-sql > $null
 
-    New-ADUser -Name "installpc" -GivenName "install" -Surname "pc" -SamAccountName "installpc" -Description "Compte d'installation PC." -UserPrincipalName "installpc@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Superadministrat0r!" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
 
 
 
