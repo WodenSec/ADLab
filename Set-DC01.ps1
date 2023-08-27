@@ -206,6 +206,7 @@ function Add-ServerContent{
     setspn -A svc-sql/wodensec.local wodensec\svc-sql > $null
     setspn -A DomainController/svc-sql.wodensec.local:`60111 wodensec\svc-sql > $null
 
+    New-ADUser -Name "installpc" -GivenName "install" -Surname "pc" -SamAccountName "installpc" -Description "Compte d'installation PC." -UserPrincipalName "installpc@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Superadministrat0r!" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
 
 
 
@@ -325,6 +326,20 @@ function Add-ServerContent{
   write-host("`n  [++] Setting GPO Registry key: WindowsUpdate")
   # reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v "NoAutoUpdate" /t REG_DWORD /d "1" /f > $null
   Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -ValueName "NoAutoUpdate" -Value 1 -Type Dword | Out-Null
+
+      # Dark Mode GPO 
+    write-host("`n  [++] Setting GPO Registry key: Dark Theme")
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" -ValueName "AppsUseLightTheme" -Value 0 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" -ValueName "SystemUsesLightTheme" -Value 0 -Type Dword | Out-Null
+    
+    # Disable screen time out and screen locker (its a lab!)
+    write-host("`n  [++] Setting GPO Registry key: Disable Screenlock, timer")
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Control Panel\Desktop\" -ValueName "ScreenSaveTimeOut" -Value 0 -Type Dword
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Control Panel\Desktop\" -ValueName "ScreenSaveActive" -Value 0 -Type Dword
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Control Panel\Desktop\" -ValueName "ScreenSaverIsSecure" -Value 0 -Type Dword | Out-Null
+
+    # set ipv4 prefrence over ipv6 
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters\" -ValueName "DisabledComponents" -Value 0x20 -Type Dword 
  
 }
 
