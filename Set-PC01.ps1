@@ -18,7 +18,7 @@ function Nuke-Defender{
     Set-MpPreference -DisableRestorePoint  $true | Out-Null
     Set-MpPreference -DisableScanningMappedNetworkDrivesForFullScan  $true | Out-Null
     Set-MpPreference -DisableScanningNetworkFiles  $true | Out-Null
-     Set-MpPreference -DisableScriptScanning $true | Out-Null
+    Set-MpPreference -DisableScriptScanning $true | Out-Null
 
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /f /v EnableLUA /t REG_DWORD /d 0 > $null
     reg add "HKLM\System\CurrentControlSet\Services\SecurityHealthService" /v "Start" /t REG_DWORD /d "4" /f > $null  
@@ -74,49 +74,32 @@ function Nuke-Defender{
 function Set-PC01 { 
 
 
-  if ($env:COMPUTERNAME -ne "PC01") { 
-    write-host ("`n Setting the name of this machine to PC01 and rebooting automatically...")
+    if ($env:COMPUTERNAME -ne "PC01") { 
+        write-host ("`n Changement des paramètres IP et du nom et reboot...")
 
-    # Remove updates
-    Get-WmiObject -query "Select HotFixID  from Win32_QuickFixengineering" | sort-object -Descending -Property HotFixID|%{
-    $sUpdate=$_.HotFixID.Replace("KB","")
-    write-host ("Uninstalling update "+$sUpdate);
-    & wusa.exe /uninstall /KB:$sUpdate /quiet /norestart;
-    Wait-Process wusa 
-    Start-Sleep -s 1 }
+        $NetAdapter=Get-CimInstance -Class Win32_NetworkAdapter -Property NetConnectionID,NetConnectionStatus | Where-Object { $_.NetConnectionStatus -eq 2 } | Select-Object -Property NetConnectionID -ExpandProperty NetConnectionID
+        $IPAddress=Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias $NetAdapter | Select-Object -ExpandProperty IPAddress
+        $IPByte = $IPAddress.Split(".")
+        $DNS = ($IPByte[0]+"."+$IPByte[1]+"."+$IPByte[2]+".250")
+        Set-DnsClientServerAddress -InterfaceAlias $NetAdapter -ServerAddresses ("$DNS","1.1.1.1")
+        Disable-NetAdapterPowerManagement -Name "$NetAdapter"
+        netsh interface ipv6 set dnsservers "$NetAdapter" dhcp
 
-    $NetAdapter=Get-CimInstance -Class Win32_NetworkAdapter -Property NetConnectionID,NetConnectionStatus | Where-Object { $_.NetConnectionStatus -eq 2 } | Select-Object -Property NetConnectionID -ExpandProperty NetConnectionID
-    $IPAddress=Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias $NetAdapter | Select-Object -ExpandProperty IPAddress
-    $IPByte = $IPAddress.Split(".")
-    $DNS = ($IPByte[0]+"."+$IPByte[1]+"."+$IPByte[2]+".250")
-    Set-DnsClientServerAddress -InterfaceAlias $NetAdapter -ServerAddresses ("$DNS","1.1.1.1")
-
-
-    Disable-NetAdapterPowerManagement -Name "$NetAdapter"
-
-    netsh interface ipv6 set dnsservers "$NetAdapter" dhcp
-
-    Rename-Computer -NewName "PC01" -Restart
-
+        Rename-Computer -NewName "PC01" -Restart
 
     }
-    elseif ($env:COMPUTERNAME -eq "PC01") {
+    elseif ($env:COMPUTERNAME -eq "PC01" -and $env:USERDNSDOMAIN -ne "WODENSEC.LOCAL") {
+        write-host ("`n Suppression de l'antivirus, ajout au domaine et reboot...")
+        
+        Nuke-Defender
+        $domain = "WODENSEC"
+        $password = "R00tR00t" | ConvertTo-SecureString -asPlainText -Force
+        $username = "$domain\Administrateur" 
+        $credential = New-Object System.Management.Automation.PSCredential($username,$password)
+        Add-Computer -DomainName $domain -Credential $credential  | Out-Null 
 
-    Nuke-Defender
-
-
-
-        write-host("`n Joining machine to domain wodensec.local")
-      $domain = "WODENSEC"
-      $password = "R00tR00t" | ConvertTo-SecureString -asPlainText -Force
-      $username = "$domain\Administrateur" 
-      $credential = New-Object System.Management.Automation.PSCredential($username,$password)
-      Add-Computer -DomainName $domain -Credential $credential  | Out-Null 
-
-      restart-computer 
-
-
+        restart-computer
 
     }
-    else { write-host("Nothing to do here") }
+    else { write-host("Il semblerait que le PC soit entièrement configuré") }
 } 
