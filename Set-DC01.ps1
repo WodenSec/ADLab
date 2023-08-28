@@ -170,48 +170,41 @@ function Add-ServerContent{
     Add-User -prenom "Richard" -nom "Cuvillier" -sam "rcuvillier" -ou "management" -mdp "VwBvAGQAZQBuAHMAZQBjADEAMgAzAA=="
     Add-User -prenom "Basile" -nom "Delacroix" -sam "bdelacroix" -ou "management" -mdp "QQB6AGUAcgB0AHkAIwAxADUA"
     Add-User -prenom "Martine" -nom "Baudet" -sam "mbaudet" -ou "management" -mdp "NgA3AEQAMQBmAEQAJQAlAGsAOAByADgA"
+    Add-ADGroupMember -Identity "Management" -Members rcuvillier,bdelacroix,mbaudet
 
     # RH
     Add-User -prenom "Louise" -nom "Chappuis" -sam "lchappuis" -ou "rh" -mdp "QQB6AGUAcgB0AHkAMQAyADMA"
     Add-User -prenom "Sarah" -nom "Meyer" -sam "smeyer" -ou "rh" -mdp "VwBvAGQAZQBuAHMAZQBjADIAMAAyADQAIQA="
+    Add-ADGroupMember -Identity "RH" -Members lchappuis,smeyer
 
     # Consultants
     Add-User -prenom "Henri" -nom "Walter" -sam "hwalter" -ou "consultants" -mdp "VwBvAGQAZQBuAHMAZQBjACoAOQA4AA=="
     Add-User -prenom "Bertrand" -nom "Dubois" -sam "bdubois" -ou "consultants" -mdp "SwBpAEwAbABFAHIANQAhAA=="
     Add-User -prenom "Didier" -nom "Leroux" -sam "dleroux" -ou "consultants" -mdp "WgBvAHIAYQBSAG8AcwBlADkAMQAhAA=="
     Add-User -prenom "Pascal" -nom "Mesny" -sam "pmesny" -ou "consultants" -mdp "dwBzADkAcABBACYAbABnADcATgAzADIA"
-
-
-    Add-User -prenom "Louise" -nom "Chappuis" -sam "lchappuis" -ou "consultants" -mdp "QQB6AGUAcgB0AHkAMQAyADMA"
-    Add-User -prenom "Sarah" -nom "Meyer" -sam "smeyer" -ou "consultants" -mdp "VwBvAGQAZQBuAHMAZQBjADIAMAAyADQAIQA="
-    Add-User -prenom "Louise" -nom "Chappuis" -sam "lchappuis" -ou "consultants" -mdp "QQB6AGUAcgB0AHkAMQAyADMA"
-    Add-User -prenom "Sarah" -nom "Meyer" -sam "smeyer" -ou "consultants" -mdp "VwBvAGQAZQBuAHMAZQBjADIAMAAyADQAIQA="
-
-   New-ADUser -Name "Pascal Mesny" -GivenName "Pascal" -Surname "Mesny" -SamAccountName "pmesny" -UserPrincipalName "pmesny@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "ws9pA&lg7N32" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "Lydia Beaumont" -GivenName "Lydia" -Surname "Beaumont" -SamAccountName "lbeaumont" -UserPrincipalName "lbeaumont@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "T0ki0H0t3l" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "Alexia Chabert" -GivenName "Alexia" -Surname "Chabert" -SamAccountName "achabert" -UserPrincipalName "achabert@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "POiu*&87^%" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "Dylan Brassard" -GivenName "Dylan" -Surname "Brassard" -SamAccountName "dbrassard" -UserPrincipalName "dbrassard@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Ksdi3426C&ve" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "Lara Fournier" -GivenName "Lara" -Surname "Fournier" -SamAccountName "lfournier" -UserPrincipalName "lfournier@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "87cbzuvsF02&" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "Hugo Dupuy" -GivenName "Hugo" -Surname "Dupuy" -SamAccountName "hdupuy" -UserPrincipalName "hdupuy@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "X2w^vY432EoP" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
+    Add-User -prenom "Lydia" -nom "Beaumont" -sam "lbeaumont" -ou "consultants" -mdp "VAAwAGsAaQAwAEgAMAB0ADMAbAA="
+    Add-User -prenom "Alexia" -nom "Chabert" -sam "achabert" -ou "consultants" -mdp "UABPAGkAdQAqACYAOAA3AF4AJQA="
+    Add-User -prenom "Dylan" -nom "Brassard" -sam "dbrassard" -ou "consultants" -mdp "SwBzAGQAaQAzADQAMgA2AEMAJgB2AGUA"
+    Add-User -prenom "Lara" -nom "Fournier" -sam "lfournier" -ou "consultants" -mdp "OAA3AGMAYgB6AHUAdgBzAEYAMAAyACYA"
+    Add-User -prenom "Hugo" -nom "Dupuy" -sam "hdupuy" -ou "consultants" -mdp "WAAyAHcAXgB2AFkANAAzADIARQBvAFAA"
+    Add-ADGroupMember -Identity "Consultants" -Members hwalter,bdubois,dleroux,pmesny,lbeaumont,achabert,dbrassard,lfournier,hdupuy
 
     # Vente
-    New-ADUser -Name "Olivier Bossuet" -GivenName "Olivier" -Surname "Bossuet" -SamAccountName "obossuet" -UserPrincipalName "obossuet@wodensec.local" -Path "OU=vente,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "bxL!@2Me1M8u" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "Jessica Plantier" -GivenName "Jessica" -Surname "Plantier" -SamAccountName "jplantier" -UserPrincipalName "jplantier@wodensec.local" -Path "OU=vente,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "W0d3ns3c" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "Jade Schneider" -GivenName "Jade" -Surname "Schneider" -SamAccountName "jschneider" -UserPrincipalName "jschneider@wodensec.local" -Path "OU=vente,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Tzj044ZeV&Yu" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    
+    Add-User -prenom "Olivier" -nom "Bossuet" -sam "obossuet" -ou "vente" -mdp "YgB4AEwAIQBAADIATQBlADEATQA4AHUA"
+    Add-User -prenom "Jessica" -nom "Plantier" -sam "jplantier" -ou "vente" -mdp "VwAwAGQAMwBuAHMAMwBjAA=="
+    Add-User -prenom "Jade" -nom "Schneider" -sam "jschneider" -ou "vente" -mdp "VAB6AGoAMAA0ADQAWgBlAFYAJgBZAHUA"
+    Add-ADGroupMember -Identity "Vente" -Members obossuet,jplantier,jschneider
+
     # Comptes IT et comptes IT admins du domaine
-    New-ADUser -Name "Sylvain Cormier" -GivenName "Sylvain" -Surname "Cormier" -SamAccountName "scormier" -UserPrincipalName "scormier@wodensec.local" -Path "OU=IT,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "zL0T1N!4AAYr" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "Admin Sylvain Cormier" -GivenName "Admin" -Surname "Sylvain Cormier" -SamAccountName "adm-scormier" -UserPrincipalName "adm-scormier@wodensec.local" -Path "OU=IT,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "zL0T1N!4AAYrzL0T1N!4AAYr" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "Maxime Laurens" -GivenName "Maxime" -Surname "Laurens" -SamAccountName "mlaurens" -UserPrincipalName "mlaurens@wodensec.local" -Path "OU=IT,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Wodensec2024" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "Admin Maxime Laurens" -GivenName "Admin" -Surname "Maxime Laurens" -SamAccountName "adm-mlaurens" -UserPrincipalName "adm-mlaurens@wodensec.local" -Path "OU=IT,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "203cg1nSTo&p" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    Add-ADGroupMember -Identity "Admins du domaine" -Members adm-scormier
-    Add-ADGroupMember -Identity "Admins du domaine" -Members adm-mlaurens
+    Add-User -prenom "Sylvain" -nom "Cormier" -sam "scormier" -ou "it" -mdp "egBMADAAVAAxAE4AIQA0AEEAQQBZAHIA"
+    Add-User -prenom "Admin" -nom "Sylvain Cormier" -sam "adm-scormier" -ou "it" -mdp "egBMADAAVAAxAE4AIQA0AEEAQQBZAHIAegBMADAAVAAxAE4AIQA0AEEAQQBZAHIA"
+    Add-User -prenom "Maxime" -nom "Laurens" -sam "mlaurens" -ou "it" -mdp "VwBvAGQAZQBuAHMAZQBjADIAMAAyADQA"
+    Add-User -prenom "Admin" -nom "Maxime Laurens" -sam "adm-mlaurens" -ou "it" -mdp "MgAwADMAYwBnADEAbgBTAFQAbwAmAHAA"
+    Add-ADGroupMember -Identity "Admins du domaine" -Members adm-scormier,adm-mlaurens
 
     # Quelques comptes désactivés
-    New-ADUser -Name "Arnaud Trottier" -GivenName "Arnaud" -Surname "Trottier" -SamAccountName "atrottier" -Description "Désactivé le 14/06/2023" -UserPrincipalName "atrottier@wodensec.local" -Path "OU=vente,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "E&872JqMU5Lq" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
-    New-ADUser -Name "Guillaume Brazier" -GivenName "Guillaume" -Surname "Brazier" -SamAccountName "gbrazier" -Description "Désactivé le 25/08/2023" -UserPrincipalName "gbrazier@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "E&872JqMU5Lq" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
-
-
+    New-ADUser -Name "Arnaud Trottier" -GivenName "Arnaud" -Surname "Trottier" -SamAccountName "atrottier" -Description "Désactivé le 14/06/2023" -UserPrincipalName "atrottier@wodensec.local" -Path "OU=vente,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "E&JqMU8725Lq" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
+    New-ADUser -Name "Guillaume Brazier" -GivenName "Guillaume" -Surname "Brazier" -SamAccountName "gbrazier" -Description "Désactivé le 25/08/2023" -UserPrincipalName "gbrazier@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "2JqMU5LqE&87" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
 
     # Comptes de service et SPN
     New-ADUser -Name "installpc" -GivenName "install" -Surname "pc" -SamAccountName "installpc" -Description "Compte d'installation PC." -UserPrincipalName "installpc@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Superadministrat0r!" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
@@ -223,137 +216,53 @@ function Add-ServerContent{
     setspn -A DomainController/svc-sql.wodensec.local:`60111 wodensec\svc-sql > $null
 
 
+    write-host("`n  [++] Creation de GPO")
+    New-GPO -Name "Disable Defender"
 
-
-    write-host("`n  [++] Creating new Disable Defender Group Policy Object")
-  New-GPO -Name "Disable Defender"
-
-  #reg add "HKLM\SYSTEM\CurrentControlSet\Services\FDResPub" /f /v DependOnService /t REG_MULTI_SZ /d "RpcSs\0http\0fpdhost\0LanmanWorkstation"
-  write-host("`n  [++] Setting GPO Registry key: FDResPub")
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\SYSTEM\CurrentControlSet\Services\FDResPub" -ValueName "DependOnService" -Type MultiString -Value "RpcSs\0http\0fpdhost\0LanmanWorkstation"
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ValueName "sc_fdredpub" -Type MultiString -Value "sc config fdrespub depend= RpcSs/http/fdphost/LanmanWorkstation"
-  reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /f /v sc_fdrespub /t REG_EXPAND_SZ /d "sc config fdrespub depend= RpcSs/http/fdphost/LanmanWorkstation"
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\SYSTEM\CurrentControlSet\Services\FDResPub" -ValueName "DependOnService" -Type MultiString -Value "RpcSs\0http\0fpdhost\0LanmanWorkstation"
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" -ValueName "sc_fdredpub" -Type MultiString -Value "sc config fdrespub depend= RpcSs/http/fdphost/LanmanWorkstation"
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /f /v sc_fdrespub /t REG_EXPAND_SZ /d "sc config fdrespub depend= RpcSs/http/fdphost/LanmanWorkstation"
   
-  # enable rdp 
-  # Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -value 0
-  write-host("`n  [++] Enable RDP")
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\System\CurrentControlSet\Control\Terminal Server" -ValueName "fDenyTSConnections" -Value 0 -Type Dword | Out-Null 
-
-  #reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /f /v EnableLUA /t REG_DWORD /d 0 > $null
-  write-host("`n  [++] Setting GPO Registry key: EnableLUA")
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -ValueName "EnableLUA" -Value 0 -Type Dword | Out-Null
-
-  #Set-GPRegistryValue -Name "LAPS_IT" -Key "HKLM\Software\Policies\Microsoft Services\AdmPwd" -ValueName 'AdmPwdEnabled' -Value 1 -Type Dword
-  #reg add "HKLM\System\CurrentControlSet\Services\SecurityHealthService" /v "Start" /t REG_DWORD /d "4" /f > $null
-  write-host("`n  [++] Setting GPO Registry key: SecurityHealthService")
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\System\CurrentControlSet\Services\SecurityHealthService" -ValueName "Start" -Value 4 -Type Dword | Out-Null
-  # remove defender reg hive if it exists
-  # reg delete "HKLM\Software\Policies\Microsoft\Windows Defender" /f > $null
+    # Enable rdp 
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\System\CurrentControlSet\Control\Terminal Server" -ValueName "fDenyTSConnections" -Value 0 -Type Dword | Out-Null 
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -ValueName "EnableLUA" -Value 0 -Type Dword | Out-Null
   
-  # defender av go bye bye domain group policy! 
-  # reg add "HKLM\Software\Policies\Microsoft\Windows Defender" /v "DisableAntiSpyware" /t REG_DWORD /d "1" /f > $null
-  write-host("`n  [++] Setting GPO Registry key: DisableAntiSpyware")
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender" -ValueName "DisableAntiSpyware" -Value 1 -Type Dword | Out-Null
-
-  #reg add "HKLM\Software\Policies\Microsoft\Windows Defender" /v "DisableAntiVirus" /t REG_DWORD /d "1" /f > $null
-  write-host("`n  [++] Setting GPO Registry key: DisableAntiVirus")
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender" -ValueName "DisableAntiVirus" -Value 1 -Type Dword | Out-Null
-
-  #reg add "HKLM\Software\Policies\Microsoft\Windows Defender\MpEngine" /v "MpEnablePus" /t REG_DWORD /d "0" /f > $null
-  write-host("`n  [++] Setting GPO Registry key: MpEnablePus")
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\MpEngine" -ValueName "MpEnablePus" -Value 0 -Type Dword | Out-Null
-
-  write-host("`n  [++] Setting GPO Registry key: RTP DisableBehaviorMonitoring")
-  #reg add "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableBehaviorMonitoring" /t REG_DWORD /d "1" /f > $null
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" -ValueName "DisableBehaviorMonitoring" -Value 1 -Type Dword | Out-Null
-
-  write-host("`n  [++] Setting GPO Registry key: RTP DisableIOAVProtection")
-  #reg add "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableIOAVProtection" /t REG_DWORD /d "1" /f > $null
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" -ValueName "DisableIOAVProtection" -Value 1 -Type Dword | Out-Null
-  
-  write-host("`n  [++] Setting GPO Registry key: RTP DisableOnAccessProtection")
-  #reg add "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableOnAccessProtection" /t REG_DWORD /d "1" /f > $null
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" -ValueName "DisableOnAccessProtection" -Value 1 -Type Dword | Out-Null
-
-  write-host("`n  [++] Setting GPO Registry key: RTP DisableRealtimeMonitoring")
-  #reg add "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableRealtimeMonitoring" /t REG_DWORD /d "1" /f > $null
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" -ValueName "DisableRealtimeMonitoring" -Value 1 -Type Dword | Out-Null
+    # Nuke Defender GPO
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\System\CurrentControlSet\Services\SecurityHealthService" -ValueName "Start" -Value 4 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender" -ValueName "DisableAntiSpyware" -Value 1 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender" -ValueName "DisableAntiVirus" -Value 1 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\MpEngine" -ValueName "MpEnablePus" -Value 0 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" -ValueName "DisableBehaviorMonitoring" -Value 1 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" -ValueName "DisableIOAVProtection" -Value 1 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" -ValueName "DisableOnAccessProtection" -Value 1 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" -ValueName "DisableRealtimeMonitoring" -Value 1 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" -ValueName "DisableScanOnRealtimeEnable" -Value 1 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" -ValueName "DisableScriptScanning" -Value 1 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\Reporting" -ValueName "DisableEnhancedNotifications" -Value 1 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\SpyNet" -ValueName "DisableBlockAtFirstSeen" -Value 1 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\SpyNet" -ValueName "SpynetReporting" -Value 0 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\SpyNet" -ValueName "SubmitSamplesConsent" -Value 2 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\System\CurrentControlSet\Control\WMI\Autologger\DefenderApiLogger" -ValueName "Start" -Value 0 -Type Dword | Out-Null 
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\System\CurrentControlSet\Control\WMI\Autologger\DefenderAuditLogger" -ValueName "Start" -Value 0 -Type Dword | Out-Null 
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters" -ValueName "RequireSecuritySignature" -Value 0 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -ValueName "requiresecuritysignature" -Value 0 -Type Dword | Out-Null
  
-  write-host("`n  [++] Setting GPO Registry key: RTP DisableScanOnRealtimeEnable")
-  #reg add "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableScanOnRealtimeEnable" /t REG_DWORD /d "1" /f > $null
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" -ValueName "DisableScanOnRealtimeEnable" -Value 1 -Type Dword | Out-Null
+    # PrintNightmare
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" -ValueName "NoWarningNoElevationOnInstall" -Value 1 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" -ValueName "RestrictDriverInstallationToAdministrators" -Value 0 -Type Dword | Out-Null
 
-  write-host("`n  [++] Setting GPO Registry key: RTP DisableScriptScanning")
-  #Set-MpPreference -DisableScriptScanning $true 
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" -ValueName "DisableScriptScanning" -Value 1 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system" -ValueName "LocalAccountTokenFilterPolicy" -Value 1 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Installer" -ValueName "AlwaysInstallElevated" -Value 0 -Type Dword | Out-Null
+    Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -ValueName "NoAutoUpdate" -Value 1 -Type Dword | Out-Null
 
-  write-host("`n  [++] Setting GPO Registry key: Defender Reporting DisableEnhancedNotifications")
-  #reg add "HKLM\Software\Policies\Microsoft\Windows Defender\Reporting" /v "DisableEnhancedNotifications" /t REG_DWORD /d "1" /f > $null
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\Reporting" -ValueName "DisableEnhancedNotifications" -Value 1 -Type Dword | Out-Null
-
-  write-host("`n  [++] Setting GPO Registry key: Defender SpyNet DisableBlockAtFirstSeen")
-  #reg add "HKLM\Software\Policies\Microsoft\Windows Defender\SpyNet" /v "DisableBlockAtFirstSeen" /t REG_DWORD /d "1" /f > $null
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\SpyNet" -ValueName "DisableBlockAtFirstSeen" -Value 1 -Type Dword | Out-Null
- 
-  write-host("`n  [++] Setting GPO Registry key: Defender SpyNet SpynetReporting")
-  #reg add "HKLM\Software\Policies\Microsoft\Windows Defender\SpyNet" /v "SpynetReporting" /t REG_DWORD /d "0" /f > $null
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\SpyNet" -ValueName "SpynetReporting" -Value 0 -Type Dword | Out-Null
-  
-  write-host("`n  [++] Setting GPO Registry key: Defender SpyNet SubmitSamplesConsent")
-  #reg add "HKLM\Software\Policies\Microsoft\Windows Defender\SpyNet" /v "SubmitSamplesConsent" /t REG_DWORD /d "2" /f > $null
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\Software\Policies\Microsoft\Windows Defender\SpyNet" -ValueName "SubmitSamplesConsent" -Value 2 -Type Dword | Out-Null
-  
-  write-host("`n  [++] Setting GPO Registry key: Defender ApiLogger")
-  #reg add "HKLM\System\CurrentControlSet\Control\WMI\Autologger\DefenderApiLogger" /v "Start" /t REG_DWORD /d "0" /f > $null
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\System\CurrentControlSet\Control\WMI\Autologger\DefenderApiLogger" -ValueName "Start" -Value 0 -Type Dword | Out-Null 
-
-  write-host("`n  [++] Setting GPO Registry key: Defender DefenderAuditLogger")
-  #reg add "HKLM\System\CurrentControlSet\Control\WMI\Autologger\DefenderAuditLogger" /v "Start" /t REG_DWORD /d "0" /f > $null
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\System\CurrentControlSet\Control\WMI\Autologger\DefenderAuditLogger" -ValueName "Start" -Value 0 -Type Dword | Out-Null 
-
-  # smb2 signing is enabled but not required (breakout into individual fix function)
-  write-host("`n  [++] Setting GPO Registry key: Defender SMB2 Client RequireSecuritySignature")
-  #reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters" /v "RequireSecuritySignature" /t REG_DWORD /d "0" /f > $null
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters" -ValueName "RequireSecuritySignature" -Value 0 -Type Dword | Out-Null
-
-  write-host("`n  [++] Setting GPO Registry key: Defender SMB2 Server RequireSecuritySignature")
-  # reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" /v "requiresecuritysignature" /t REG_DWORD /d "0" /f > $null
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -ValueName "requiresecuritysignature" -Value 0 -Type Dword | Out-Null
- 
-  # printer-nightmare registry keys (breakout into individual fix function)
-  write-host("`n  [++] Setting GPO Registry key: PrinterNightmare")
-  #reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "NoWarningNoElevationOnInstall" /t REG_DWORD /d "1" /f > $null
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" -ValueName "NoWarningNoElevationOnInstall" -Value 1 -Type Dword | Out-Null
-
-  #reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "RestrictDriverInstallationToAdministrators" /t REG_DWORD /d "0" /f > $null
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" -ValueName "RestrictDriverInstallationToAdministrators" -Value 0 -Type Dword | Out-Null
-
-  # set localaccounttokenfilterpolicy
-  write-host("`n  [++] Setting GPO Registry key: LocalAccountTokenFilterPolicy")
-  # reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system" /v "LocalAccountTokenFilterPolicy" /t REG_DWORD /d "1" /f
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system" -ValueName "LocalAccountTokenFilterPolicy" -Value 1 -Type Dword | Out-Null
-
-  # set alwaysinstallelevated 
-  write-host("`n  [++] Setting GPO Registry key: AlwaysInstallElevated")
-  # reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Installer" -v "AlwaysInstallElevated" /t REG_DWORD /d "1" /f > $null 
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Installer" -ValueName "AlwaysInstallElevated" -Value 0 -Type Dword | Out-Null
-
-  write-host("`n  [++] Setting GPO Registry key: WindowsUpdate")
-  # reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v "NoAutoUpdate" /t REG_DWORD /d "1" /f > $null
-  Set-GPRegistryValue -Name "Disable Defender" -Key "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -ValueName "NoAutoUpdate" -Value 1 -Type Dword | Out-Null
-
-      # Dark Mode GPO 
-    write-host("`n  [++] Setting GPO Registry key: Dark Theme")
+    # QoL GPO (dark mode, screen locker)
     Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" -ValueName "AppsUseLightTheme" -Value 0 -Type Dword | Out-Null
     Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" -ValueName "SystemUsesLightTheme" -Value 0 -Type Dword | Out-Null
-    
-    # Disable screen time out and screen locker (its a lab!)
-    write-host("`n  [++] Setting GPO Registry key: Disable Screenlock, timer")
     Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Control Panel\Desktop\" -ValueName "ScreenSaveTimeOut" -Value 0 -Type Dword
     Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Control Panel\Desktop\" -ValueName "ScreenSaveActive" -Value 0 -Type Dword
     Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Control Panel\Desktop\" -ValueName "ScreenSaverIsSecure" -Value 0 -Type Dword | Out-Null
 
-    # set ipv4 prefrence over ipv6 
+    # IPv4 > IPv6
     Set-GPRegistryValue -Name "Disable Defender" -Key "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters\" -ValueName "DisabledComponents" -Value 0x20 -Type Dword 
  
 }
@@ -363,7 +272,7 @@ function Invoke-DCSetup{
     if($env:COMPUTERNAME -ne "DC01" ){
         Write-Host("Première execution détectée. Changement des paramètres réseau...")
         Set-IPAddress
-        Write-Host("Suppression de l'antivirus et autre...")
+        Write-Host("Suppression de l'antivirus...")
         Nuke-Defender
         Add-WindowsFeature -Name "RSAT-AD-PowerShell" –IncludeAllSubFeature
         Write-Host("Changement QoL")
