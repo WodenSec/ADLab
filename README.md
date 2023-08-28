@@ -27,3 +27,7 @@
 - Récupérer le script `Set-PC01` et le "dot-source" avec la commande `. .\Set-PC01.ps1`
 - Lancer la fonction `Set-PC01`
 - Le script va redémarrer l'ordinateur une fois. Il faut donc lancer la même fonction deux fois en tout
+
+## Notes
+
+Merci à [Dewalt](https://github.com/Dewalt-arch) pour son script [pimpmyadlab](https://github.com/Dewalt-arch/pimpmyadlab/tree/main). 
