@@ -7,6 +7,9 @@
   - [Windows 10 Enterprise](https://info.microsoft.com/ww-landing-windows-10-enterprise.html?lcid=fr)
   - [Windows Server 2022](https://www.microsoft.com/fr-fr/evalcenter/evaluate-windows-server-2022 )
 - Créer les VM dans un hyperviseur en les nommant DC01 et PC01
+  - Recommandé: 4GB de RAM, 2 CPU
+  - Minimum: 3GB de RAM, 1 CPU
+  - Disque: 50GB dynamique
 - Changer les paramètres réseaux pour que les VM puissent communiquer entre elles (avec Kali également)
   - VirtualBox: NAT Network
   - VMWare: Custom (VMNet8)
