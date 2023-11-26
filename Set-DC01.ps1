@@ -155,6 +155,7 @@ function Add-ServerContent{
     New-ADGroup -name "Management" -GroupScope Global
     New-ADGroup -name "Consultants" -GroupScope Global
     New-ADGroup -name "Vente" -GroupScope Global
+    New-ADGroup -name "Backup" -GroupScope Global
 
     New-ADOrganizationalUnit -Name "Groupes" -Path "DC=wodensec,DC=local"
     New-ADOrganizationalUnit -Name "RH" -Path "DC=wodensec,DC=local"
@@ -214,6 +215,11 @@ function Add-ServerContent{
     setspn -A DC01/svc-sql.wodensec.local:`60111 wodensec\svc-sql > $null
     setspn -A svc-sql/wodensec.local wodensec\svc-sql > $null
     setspn -A DomainController/svc-sql.wodensec.local:`60111 wodensec\svc-sql > $null
+
+
+    # Share
+    mkdir C:\Share
+    New-SmbShare -Name "Share" -Path "C:\Share" -ChangeAccess "Utilisateurs" -FullAccess "Tout le monde" -WarningAction SilentlyContinue | Out-Null
 
 
     write-host("`n  [++] Creation de GPO")
