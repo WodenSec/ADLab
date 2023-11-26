@@ -23,6 +23,13 @@
 - Lancer la fonction `Invoke-DCSetup`
 - Le script va redémarrer le serveur deux fois. Il faut donc lancer la même fonction trois fois en tout
 
+#### Configuration manuelle sur le DC
+- Aller dans `Utilisateurs et ordinateurs Active Directory`
+- Dans `Affichage`, cliquer sur `Fonctionnalités avancées`
+- Cliquer droit sur `WODENSEC.local` dans l'arborescence
+- Dans l'onglet `Sécurité`, `Ajouter...` ajouter le groupe `Backup`
+- Sélectionner le groupe `Backup` et Autoriser les permissions `Réplication de toutes les modifications de l'annuaire`, `Réplication des changements de répertoire` et `Réplication des changements de répertoires dans un ensemble filtré`
+
 ### Setup du PC
 - Une fois le DC configuré, lancer le PC et installer Windows
 - Utiliser les credentials suivantes pour la configuration: `installpc` / `Superadministrat0r!`
