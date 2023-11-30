@@ -32,7 +32,7 @@
 
 ### Setup du PC
 - Une fois le DC configuré, lancer le PC et installer Windows
-- Utiliser les credentials suivantes pour la configuration: `installpc` / `Superadministrat0r!`
+- Utiliser les credentials suivantes pour la configuration: `installpc` / `Sysadmin123!`
 - Installer les VM Tools / Guest Additions puis redémarrer
 - Récupérer le script `Set-PC01` et le "dot-source" avec la commande `. .\Set-PC01.ps1`
 - Lancer la fonction `Set-PC01`
