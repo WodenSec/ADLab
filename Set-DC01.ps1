@@ -222,6 +222,8 @@ function Add-ServerContent{
     mkdir C:\Share
     New-SmbShare -Name "Share" -Path "C:\Share" -ChangeAccess "Utilisateurs" -FullAccess "Tout le monde" -WarningAction SilentlyContinue | Out-Null
 
+    # For Passback attack
+    Invoke-WebRequest -Uri "https://github.com/WodenSec/ADLab/raw/main/LdapAdminPortable.zip" -OutFile "C:\Share\LdapAdminPortable.zip"
 
     write-host("`n  [++] Creation de GPO")
     New-GPO -Name "Disable Defender"
