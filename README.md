@@ -38,6 +38,8 @@
 - Lancer la fonction `Set-PC01`
 - Le script va redémarrer l'ordinateur une fois. Il faut lancer la même fonction deux fois en tout
 
+> Si vos ressources (RAM,CPU) le permettent, créer un deuxième PC de la même manière avec `Set-PC02`
+
 ### Snapshots
 - Une fois que le DC et PC sont configurés, faire un snapshot des deux VM
 
