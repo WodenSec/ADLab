@@ -6,7 +6,7 @@
 - Récupérer les ISO
   - [Windows 10 Enterprise](https://info.microsoft.com/ww-landing-windows-10-enterprise.html?lcid=fr)
   - [Windows Server 2022](https://www.microsoft.com/fr-fr/evalcenter/evaluate-windows-server-2022 )
-- Créer les VM dans un hyperviseur en les nommant DC01 et PC01
+- Créer les VM dans un hyperviseur en les nommant DC01, PC01 & PC02
   - Recommandé: 4GB de RAM, 2 CPU
   - Minimum: 3GB de RAM, 1 CPU
   - Disque: 50GB dynamique
@@ -30,7 +30,7 @@
 - Dans l'onglet `Sécurité`, `Ajouter...` ajouter le groupe `Backup`
 - Sélectionner le groupe `Backup` et Autoriser les permissions `Réplication de toutes les modifications de l'annuaire`, `Réplication des changements de répertoire` et `Réplication des changements de répertoires dans un ensemble filtré`
 
-### Setup du PC
+### Setup des PC
 - Une fois le DC configuré, lancer le PC et installer Windows
 - Utiliser les credentials suivantes pour la configuration: `installpc` / `Sysadmin123!`
 - Installer les VM Tools / Guest Additions puis redémarrer
