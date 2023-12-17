@@ -1,6 +1,6 @@
 # ADLab
 
-## Mise en place du lab
+## Mise en place du lab Active Directory
 
 ### Setup des VM
 - Récupérer les ISO
@@ -42,6 +42,11 @@
 
 ### Snapshots
 - Une fois que le DC et PC sont configurés, faire un snapshot des deux VM
+
+## Setup Kali
+- Récupérer le script `kali_setup.sh` et le lancer une fois en tant que `root`.
+- Puis redémarrer la VM, se connecter en tant que `root` et le relancer.
+
 
 ## Notes
 
