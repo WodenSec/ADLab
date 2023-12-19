@@ -33,6 +33,7 @@
 
 ### Setup des PC
 - Une fois le DC configuré, lancer le PC et installer Windows
+- Sélectionner "Joindre le domaine à la place" pour la création du compte.
 - Utiliser les credentials suivantes pour la configuration: `installpc` / `Sysadmin123!`
 - Installer les VM Tools / Guest Additions puis redémarrer
 - Récupérer le script `Set-PC01` et le "dot-source" avec la commande `. .\Set-PC01.ps1`
