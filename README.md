@@ -5,7 +5,7 @@
 ### Setup des VM
 - Récupérer les ISO
   - [Windows 10 Enterprise](https://info.microsoft.com/ww-landing-windows-10-enterprise.html?lcid=fr)
-  - [Windows Server 2022](https://www.microsoft.com/fr-fr/evalcenter/evaluate-windows-server-2022 )
+  - [Windows Server 2022](https://info.microsoft.com/ww-landing-windows-server-2022.html?lcid=fr)
 - Créer les VM dans un hyperviseur en les nommant DC01, PC01 & PC02
   - **Pour VirtualBox, cocher "Skip Unattended Installation"**
   - Recommandé: 4GB de RAM, 2 CPU
