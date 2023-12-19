@@ -23,7 +23,8 @@
 - Ouvrir PowerShell en admin, ensuite taper la commande `powershell -ep bypass`
 - Récupérer le script `Set-DC01` et le "dot-source" avec la commande `. .\Set-DC01.ps1`
 - Lancer la fonction `Invoke-DCSetup`
-- Le script va redémarrer le serveur deux fois. Il faut donc lancer la même fonction trois fois en tout
+- Le script va redémarrer le serveur. Il faut le relancer en utilisant les mêmes commandes un deuxième fois.
+- Ensuite, le serveur va de nouveau redémarrer. Cette fois il faut se connecter avec le compte `Administrateur` dans le domain `WODENSEC.local` et relancer le script une dernière fois.
 
 #### Configuration manuelle sur le DC
 - Aller dans `Utilisateurs et ordinateurs Active Directory`
