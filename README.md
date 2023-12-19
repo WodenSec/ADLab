@@ -8,6 +8,7 @@
   - [Windows Server 2022](https://info.microsoft.com/ww-landing-windows-server-2022.html?lcid=fr)
 - Créer les VM dans un hyperviseur en les nommant DC01, PC01 & PC02
   - **Pour VirtualBox, cocher "Skip Unattended Installation"**
+  - **Pour VMWare, choisir **I will install the operating system later** et ensuite seulement insérer l'ISO dans le DVD drive
   - Recommandé: 4GB de RAM, 2 CPU
   - Minimum: 3GB de RAM, 1 CPU
   - Disque: 50GB dynamique
