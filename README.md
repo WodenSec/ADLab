@@ -20,6 +20,7 @@
 - Choisir l'installation personnalisée, sélectionner le disque et laisser faire l'installation et le redémarrage
 - Entrer le mot de passe `R00tR00t` pour l'utilisateur `Administrateur`
 - Se connecter et installer les VM Tools / Guest Additions puis éteindre
+- Ouvrir PowerShell en admin, ensuite taper la commande `powershell -ep bypass`
 - Récupérer le script `Set-DC01` et le "dot-source" avec la commande `. .\Set-DC01.ps1`
 - Lancer la fonction `Invoke-DCSetup`
 - Le script va redémarrer le serveur deux fois. Il faut donc lancer la même fonction trois fois en tout
