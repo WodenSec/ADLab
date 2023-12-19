@@ -44,7 +44,7 @@
 > Si vos ressources (RAM,CPU) le permettent, créer un deuxième PC de la même manière avec `Set-PC02`
 
 ### Snapshots
-- Une fois que le DC et PC sont configurés, faire un snapshot des deux VM
+- Une fois que le DC et PC sont configurés, faire un snapshot des VM
 
 ## Setup Kali
 - Récupérer le script `kali_setup.sh` et le lancer une fois en tant que `root`.
