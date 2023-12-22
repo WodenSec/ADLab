@@ -75,8 +75,8 @@ function Nuke-Defender{
     Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False | Out-Null
     
     # SMB signing enabled but not required
-    reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters" /v "RequireSecuritySignature" /t REG_DWORD /d "0" /f > $null
-    reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" /v "requiresecuritysignature" /t REG_DWORD /d "0" /f > $null
+    # reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters" /v "RequireSecuritySignature" /t REG_DWORD /d "0" /f > $null
+    # reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" /v "requiresecuritysignature" /t REG_DWORD /d "0" /f > $null
     # PrintNightmare
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "NoWarningNoElevationOnInstall" /t REG_DWORD /d "1" /f > $null
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "RestrictDriverInstallationToAdministrators" /t REG_DWORD /d "0" /f > $null
@@ -171,12 +171,14 @@ function Add-ServerContent{
     Add-User -prenom "Richard" -nom "Cuvillier" -sam "rcuvillier" -ou "management" -mdp "VwBvAGQAZQBuAHMAZQBjADEAMgAzAA=="
     Add-User -prenom "Basile" -nom "Delacroix" -sam "bdelacroix" -ou "management" -mdp "QQB6AGUAcgB0AHkAIwAxADUA"
     Add-User -prenom "Martine" -nom "Baudet" -sam "mbaudet" -ou "management" -mdp "NgA3AEQAMQBmAEQAJQAlAGsAOAByADgA"
-    Add-ADGroupMember -Identity "Management" -Members rcuvillier,bdelacroix,mbaudet
+    Add-User -prenom "Ludovic" -nom "Michaux" -sam "lmichaux" -ou "management" -mdp "VwBvAGQAZQBuAHMAZQBjADIAMAAyADQA"
+    Add-ADGroupMember -Identity "Management" -Members rcuvillier,bdelacroix,mbaudet,lmichaux
 
     # RH
     Add-User -prenom "Louise" -nom "Chappuis" -sam "lchappuis" -ou "rh" -mdp "QQB6AGUAcgB0AHkAMQAyADMA"
     Add-User -prenom "Sarah" -nom "Meyer" -sam "smeyer" -ou "rh" -mdp "VwBvAGQAZQBuAHMAZQBjADIAMAAyADQAIQA="
-    Add-ADGroupMember -Identity "RH" -Members lchappuis,smeyer
+    Add-User -prenom "Fabrice" -nom "Girault" -sam "fgirault" -ou "rh" -mdp "QQB6AGUAcgB0AHkAMgAwADIANAA="
+    Add-ADGroupMember -Identity "RH" -Members lchappuis,smeyer,fgirault
 
     # Consultants
     Add-User -prenom "Henri" -nom "Walter" -sam "hwalter" -ou "consultants" -mdp "VwBvAGQAZQBuAHMAZQBjACoAOQA4AA=="
@@ -188,13 +190,16 @@ function Add-ServerContent{
     Add-User -prenom "Dylan" -nom "Brassard" -sam "dbrassard" -ou "consultants" -mdp "SwBzAGQAaQAzADQAMgA2AEMAJgB2AGUA"
     Add-User -prenom "Lara" -nom "Fournier" -sam "lfournier" -ou "consultants" -mdp "OAA3AGMAYgB6AHUAdgBzAEYAMAAyACYA"
     Add-User -prenom "Hugo" -nom "Dupuy" -sam "hdupuy" -ou "consultants" -mdp "WAAyAHcAXgB2AFkANAAzADIARQBvAFAA"
-    Add-ADGroupMember -Identity "Consultants" -Members hwalter,bdubois,dleroux,pmesny,lbeaumont,achabert,dbrassard,lfournier,hdupuy
+    Add-User -prenom "Pierre" -nom "Sylvestre" -sam "psylvestre" -ou "consultants" -mdp "UABhAHMAcwB3AG8AcgBkADEAMgAzACEA"
+    Add-ADGroupMember -Identity "Consultants" -Members hwalter,bdubois,dleroux,pmesny,lbeaumont,achabert,dbrassard,lfournier,hdupuy,psylvestre
 
     # Vente
     Add-User -prenom "Olivier" -nom "Bossuet" -sam "obossuet" -ou "vente" -mdp "YgB4AEwAIQBAADIATQBlADEATQA4AHUA"
     Add-User -prenom "Jessica" -nom "Plantier" -sam "jplantier" -ou "vente" -mdp "VwAwAGQAMwBuAHMAMwBjAA=="
     Add-User -prenom "Jade" -nom "Schneider" -sam "jschneider" -ou "vente" -mdp "VAB6AGoAMAA0ADQAWgBlAFYAJgBZAHUA"
-    Add-ADGroupMember -Identity "Vente" -Members obossuet,jplantier,jschneider
+    Add-User -prenom "Laetitia" -nom "Portier" -sam "lportier" -ou "vente" -mdp "QQB6AGUAcgB0AHkAMgAwADIANAA="
+    Add-User -prenom "Cyrille" -nom "Toutain" -sam "ctoutain" -ou "vente" -mdp "cQBzAGcANQA2ADQAUwBGADIALQAkAA=="
+    Add-ADGroupMember -Identity "Vente" -Members obossuet,jplantier,jschneider,lportier,ctoutain
 
     # Comptes IT et comptes IT admins du domaine
     Add-User -prenom "Sylvain" -nom "Cormier" -sam "scormier" -ou "it" -mdp "egBMADAAVAAxAE4AIQA0AEEAQQBZAHIA"
