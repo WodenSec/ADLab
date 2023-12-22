@@ -57,9 +57,8 @@ function Nuke-Defender{
     reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters" /v "RequireSecuritySignature" /t REG_DWORD /d "0" /f > $null
     reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" /v "requiresecuritysignature" /t REG_DWORD /d "0" /f > $null
     # PrintNightmare
-    reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "NoWarningNoElevationOnInstall" /t REG_DWORD /d "1" /f > $null
-    reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "RestrictDriverInstallationToAdministrators" /t REG_DWORD /d "0" /f > $null
-
+    # reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "NoWarningNoElevationOnInstall" /t REG_DWORD /d "1" /f > $null
+    # reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "RestrictDriverInstallationToAdministrators" /t REG_DWORD /d "0" /f > $null
 
     Get-WmiObject -query "Select HotFixID  from Win32_QuickFixengineering" | sort-object -Descending -Property HotFixID|%{
     $sUpdate=$_.HotFixID.Replace("KB","")
@@ -71,8 +70,7 @@ function Nuke-Defender{
 }
 
 
-function Set-PC01 { 
-
+function Invoke-PC01Setup { 
 
     if ($env:COMPUTERNAME -ne "PC01") { 
         write-host ("`n Changement des paramètres IP et du nom et reboot...")
@@ -98,6 +96,7 @@ function Set-PC01 {
         $credential = New-Object System.Management.Automation.PSCredential($username,$password)
         Add-Computer -DomainName $domain -Credential $credential  | Out-Null 
 
+        Sleep 5
         restart-computer
 
     }
