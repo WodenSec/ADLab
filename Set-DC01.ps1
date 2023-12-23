@@ -155,6 +155,7 @@ function Add-ServerContent{
     New-ADGroup -name "Management" -GroupScope Global
     New-ADGroup -name "Consultants" -GroupScope Global
     New-ADGroup -name "Vente" -GroupScope Global
+    New-ADGroup -name "IT" -GroupScope Global
     New-ADGroup -name "Backup" -GroupScope Global
 
     New-ADOrganizationalUnit -Name "Groupes" -Path "DC=wodensec,DC=local"
@@ -206,6 +207,7 @@ function Add-ServerContent{
     Add-User -prenom "Admin" -nom "Sylvain Cormier" -sam "adm-scormier" -ou "it" -mdp "egBMADAAVAAxAE4AIQA0AEEAQQBZAHIAegBMADAAVAAxAE4AIQA0AEEAQQBZAHIA"
     Add-User -prenom "Maxime" -nom "Laurens" -sam "mlaurens" -ou "it" -mdp "VwBvAGQAZQBuAHMAZQBjADIAMAAyADQA"
     Add-User -prenom "Admin" -nom "Maxime Laurens" -sam "adm-mlaurens" -ou "it" -mdp "MgAwADMAYwBnADEAbgBTAFQAbwAmAHAA"
+    Add-ADGroupMember -Identity "IT" -Members scormier,mlaurens
     Add-ADGroupMember -Identity "Admins du domaine" -Members adm-scormier,adm-mlaurens
 
     # Quelques comptes désactivés
