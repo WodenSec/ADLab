@@ -149,6 +149,7 @@ function Add-ServerContent{
     write-host("`n  [++] Installation de RSAT-ADCS et RSAT-ADCS-Management")
     Add-WindowsFeature RSAT-ADCS,RSAT-ADCS-mgmt -WarningAction SilentlyContinue | Out-Null
 
+    Set-ADDefaultDomainPasswordPolicy -Identity "wodensec.local" -ComplexityEnabled $false
 
     # Groupes, OUs, utilisateurs
     New-ADGroup -name "RH" -GroupScope Global
@@ -216,6 +217,7 @@ function Add-ServerContent{
 
     # Comptes de service et SPN
     New-ADUser -Name "installpc" -GivenName "install" -Surname "pc" -SamAccountName "installpc" -Description "Compte d'installation PC." -UserPrincipalName "installpc@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "Sysadmin123!" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
+    New-ADUser -Name "testuser" -GivenName "test" -Surname "user" -SamAccountName "testuser" -Description "Utilisateur test" -UserPrincipalName "testuser@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "testuser" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     New-ADUser -Name "svc-sql" -GivenName "svc" -Surname "sql" -SamAccountName "svc-sql" -Description "Compte de service SQL" -UserPrincipalName "svc-sql@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "sql0v3-u" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount -PassThru  | Out-Null
     New-ADUser -Name "svc-backup" -GivenName "svc" -Surname "backup" -SamAccountName "svc-backup" -Description "Compte de service backup. Mdp: B4ckup-S3rv1c3" -UserPrincipalName "svc-backup@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "B4ckup-S3rv1c3" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     Add-ADGroupMember -Identity "Backup" -Members svc-backup
