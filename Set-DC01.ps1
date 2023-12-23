@@ -211,6 +211,14 @@ function Add-ServerContent{
     Add-ADGroupMember -Identity "IT" -Members scormier,mlaurens
     Add-ADGroupMember -Identity "Admins du domaine" -Members adm-scormier,adm-mlaurens
 
+    # ACL dangereuses pour IT
+    $DomainAdmins = Get-ADGroup "Admins du domaine"
+    $acl = Get-Acl "AD:$($DomainAdmins.DistinguishedName)"
+    $ITGroup = Get-ADGroup "IT"
+    $ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule($ITGroup.SID, "GenericAll", "Allow")
+    $acl.AddAccessRule($ace)
+    Set-Acl "AD:$($DomainAdmins.DistinguishedName)" $acl
+
     # Quelques comptes désactivés
     New-ADUser -Name "Arnaud Trottier" -GivenName "Arnaud" -Surname "Trottier" -SamAccountName "atrottier" -Description "Désactivé le 14/06/2023" -UserPrincipalName "atrottier@wodensec.local" -Path "OU=vente,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "E&JqMU8725Lq" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
     New-ADUser -Name "Guillaume Brazier" -GivenName "Guillaume" -Surname "Brazier" -SamAccountName "gbrazier" -Description "Désactivé le 25/08/2023" -UserPrincipalName "gbrazier@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "2JqMU5LqE&87" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
