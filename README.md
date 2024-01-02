@@ -41,7 +41,7 @@
 - Installer les VM Tools / Guest Additions puis redémarrer
 - Ouvrir PowerShell en admin, ensuite taper la commande `powershell -ep bypass`
 - Récupérer le script `Set-PC01` et le "dot-source" avec la commande `. .\Set-PC01.ps1`
-- Lancer la fonction `Set-PC01`
+- Lancer la fonction `Invoke-PC01Setup`
 - Le script va redémarrer l'ordinateur une fois. Il faut lancer la même fonction deux fois en tout
 
 > Si vos ressources (RAM,CPU) le permettent, créer un deuxième PC de la même manière avec `Set-PC02`
