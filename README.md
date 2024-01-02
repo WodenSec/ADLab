@@ -2,15 +2,17 @@
 
 ## Mise en place du lab Active Directory
 
+**LIRE ATTENTIVEMENT TOUTES LES ETAPES AVANT DE COMMENCER**
+
 ### Setup des VM
 - Récupérer les ISO **EN FRANCAIS**
   - [Windows 10 Enterprise](https://info.microsoft.com/ww-landing-windows-10-enterprise.html?lcid=fr)
   - [Windows Server 2022](https://info.microsoft.com/ww-landing-windows-server-2022.html?lcid=fr)
 - Créer les VM dans un hyperviseur en les nommant DC01, PC01 & PC02
-  - **Pour VirtualBox, cocher "Skip Unattended Installation"**
+  - Pour VirtualBox, cocher **"Skip Unattended Installation"**
   - Pour VMWare, choisir **I will install the operating system later** et ensuite seulement insérer l'ISO dans le DVD drive
-  - Recommandé: 4GB de RAM, 2 CPU
-  - Minimum: 3GB de RAM, 1 CPU
+  - Recommandé: 4GB de RAM, 1 ou 2 CPU
+  - Minimum: 2GB de RAM, 1 CPU
   - Disque: 50GB dynamique
 - Changer les paramètres réseaux pour que les VM puissent communiquer entre elles (avec Kali également)
   - VirtualBox: NAT Network
