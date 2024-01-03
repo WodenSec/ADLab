@@ -53,7 +53,7 @@
 
 ## Setup Kali
 - Récupérer le script `kali_setup.sh` et le lancer une fois en tant que `root`.
-- Puis redémarrer la VM, se connecter en tant que `root` et le relancer.
+- Puis redémarrer la VM, se connecter en tant que `root` (sur le login session) et le relancer.
 
 
 ## Notes
