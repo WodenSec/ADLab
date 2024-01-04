@@ -6,8 +6,8 @@
 
 ### Setup des VM
 - Récupérer les ISO **EN FRANCAIS**
-  - [Windows 10 Enterprise](https://info.microsoft.com/ww-landing-windows-10-enterprise.html?lcid=fr)
-  - [Windows Server 2022](https://info.microsoft.com/ww-landing-windows-server-2022.html?lcid=fr)
+  - [Windows 10 Enterprise](https://www.microsoft.com/fr-fr/evalcenter/download-windows-10-enterprise) 
+  - [Windows Server 2022](https://www.microsoft.com/fr-fr/evalcenter/download-windows-server-2022)
 - Créer les VM dans un hyperviseur en les nommant DC01, PC01 & PC02
   - Pour VirtualBox, cocher **"Skip Unattended Installation"**
   - Pour VMWare, choisir **I will install the operating system later** et ensuite seulement insérer l'ISO dans le DVD drive
