@@ -18,6 +18,12 @@ function Invoke-PC02Setup {
     }
     elseif ($env:COMPUTERNAME -eq "PC02" -and $env:USERDNSDOMAIN -ne "WODENSEC.LOCAL") {
         write-host ("`n Ajout au domaine et reboot...")
+
+        Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False | Out-Null
+        Get-NetFirewallRule -Group '@FirewallAPI.dll,-32752'|Set-NetFirewallRule -Profile 'Private, Domain' -Enabled true -PassThru|select Name,DisplayName,Enabled,Profile |ft -a | Out-Null
+        netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow > $null
+        netsh advfirewall firewall add rule name="ICMP Allow incoming V6 echo request" protocol=icmpv6:8,any dir=in action=allow > $nul
+        Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False | Out-Null
         
         $domain = "WODENSEC"
         $password = "R00tR00t" | ConvertTo-SecureString -asPlainText -Force
