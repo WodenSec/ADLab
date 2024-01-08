@@ -309,10 +309,10 @@ function Invoke-DCSetup{
         Start-Sleep -Seconds 5
         Rename-Computer -NewName "DC01" -Restart
     }elseif($env:USERDNSDOMAIN -ne "WODENSEC.LOCAL"){
-        Write-Host("Deuxième execution detectée. Installation des rôles...")
+        Write-Host("Deuxieme execution detectee. Installation des roles...")
         Build-Server
     }elseif($env:COMPUTERNAME -eq "DC01" -and $env:USERDNSDOMAIN -eq "WODENSEC.LOCAL"){
-        Write-Host("Troisième execution detectée. Ajout du contenu...")
+        Write-Host("Troisieme execution detectee. Ajout du contenu...")
         Add-ServerContent
 
     }
