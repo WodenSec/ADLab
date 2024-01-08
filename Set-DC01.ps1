@@ -302,7 +302,7 @@ function Invoke-DCSetup{
         Set-IPAddress
         Write-Host("Suppression de l'antivirus...")
         Nuke-Defender
-        Add-WindowsFeature -Name "RSAT-AD-PowerShell" –IncludeAllSubFeature
+        Add-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
         Write-Host("Changement QoL")
         Get-QoL
         Write-Host("Le serveur va être renommé puis redémarrer")
