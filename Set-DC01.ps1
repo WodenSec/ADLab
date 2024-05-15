@@ -226,7 +226,7 @@ function Add-ServerContent{
     # Comptes de service et SPN
     New-ADUser -Name "testuser" -GivenName "test" -Surname "user" -SamAccountName "testuser" -Description "Utilisateur test" -UserPrincipalName "testuser@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "testuser" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     New-ADUser -Name "svc-sql" -GivenName "svc" -Surname "sql" -SamAccountName "svc-sql" -Description "Compte de service SQL" -UserPrincipalName "svc-sql@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "sql0v3-u" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount -PassThru  | Out-Null
-    New-ADUser -Name "svc-backup" -GivenName "svc" -Surname "backup" -SamAccountName "svc-backup" -Description "Compte de service backup. Mdp: B4ckup-S3rv1c3" -UserPrincipalName "svc-backup@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "B4ckup-S3rv1c3" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
+    New-ADUser -Name "svc-backup" -GivenName "svc" -Surname "backup" -SamAccountName "svc-backup" -Description "Compte de service backup. Mdp: B4ckup-S3rv1c3" -UserPrincipalName "svc-backup@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "B4ckup-S3rv1c3" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
     New-ADUser -Name "svc-legacy" -GivenName "svc" -Surname "legacy" -SamAccountName "svc-legacy" -Description "Compte de service pour app legacy" -UserPrincipalName "svc-legacy@wodensec.local" -Path "OU=SVC,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "killthislegacy" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     
     Add-ADGroupMember -Identity "Backup" -Members svc-backup
@@ -236,6 +236,30 @@ function Add-ServerContent{
     setspn -A DomainController/svc-sql.wodensec.local:`60111 wodensec\svc-sql > $null
 
     Get-ADUser -Identity "svc-legacy" | Set-ADAccountControl -DoesNotRequirePreAuth:$true
+
+    
+    # ACL vers svc-backup
+    $IdentityReferenceLegacy = New-Object System.Security.Principal.NTAccount("WODENSEC.LOCAL\svc-legacy")
+    $IdentityReferenceSQL = New-Object System.Security.Principal.NTAccount("WODENSEC.LOCAL\svc-sql")
+    $user = Get-ADUser 'svc-backup' -Properties DistinguishedName
+    
+    # Obtenir et préparer les ACL pour l'utilisateur désactivé
+    $acl = Get-Acl "AD:$($user.DistinguishedName)"
+    $adRights = [System.DirectoryServices.ActiveDirectoryRights]::WriteProperty
+    $accessControlType = [System.Security.AccessControl.AccessControlType]::Allow
+    $objectType = New-Object Guid "bf967a68-0de6-11d0-a285-00aa003049e2" # GUID for the 'userAccountControl' property
+    $inheritanceType = [System.DirectoryServices.ActiveDirectorySecurityInheritance]::None
+    
+    # Créer la règle d'accès pour svc-legacy
+    $aceLegacy = New-Object System.DirectoryServices.ActiveDirectoryAccessRule($IdentityReferenceLegacy, $adRights, $accessControlType, $objectType, $inheritanceType)
+    # Créer la règle d'accès pour svc-sql
+    $aceSQL = New-Object System.DirectoryServices.ActiveDirectoryAccessRule($IdentityReferenceSQL, $adRights, $accessControlType, $objectType, $inheritanceType)
+    
+    # Appliquer la règle ACL
+    $acl.AddAccessRule($aceLegacy)
+    $acl.AddAccessRule($aceSQL)
+    Set-Acl -Path "AD:$($user.DistinguishedName)" -AclObject $acl
+
 
     # Share
     mkdir C:\Share
