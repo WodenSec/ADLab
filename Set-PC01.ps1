@@ -94,11 +94,15 @@ function Invoke-PC01Setup {
         $password = "R00tR00t" | ConvertTo-SecureString -asPlainText -Force
         $username = "$domain\Administrateur" 
         $credential = New-Object System.Management.Automation.PSCredential($username,$password)
-        Add-Computer -DomainName $domain -Credential $credential  | Out-Null 
-
-        Sleep 5
-        restart-computer
-
+        #Verif ping du domaine avant lancement de la connection
+        if (Test-Connection -ComputerName "WOODENSEC" -Count 5 -Quiet) { 
+            Add-Computer -DomainName $domain -Credential $credential  | Out-Null
+            Start-Sleep 5
+            restart-computer
+        } else {
+            Write-Error "Erreur Impossible de Ping l'AD Vérfier la connectivité ou le DNS... Arrêt dans 5sec !"
+            Start-Sleep 5
+        }
     }
     else { write-host("Il semblerait que le PC soit entièrement configuré") }
 } 
