@@ -30,7 +30,7 @@ function Invoke-PC02Setup {
         $username = "$domain\Administrateur" 
         $credential = New-Object System.Management.Automation.PSCredential($username,$password)
         #Verif ping du domaine avant lancement de la connection
-        if (Test-Connection -ComputerName "WOODENSEC" -Count 5 -Quiet) { 
+        if (Test-Connection -ComputerName "WODENSEC" -Count 5 -Quiet) { 
             Add-Computer -DomainName $domain -Credential $credential  | Out-Null
             Start-Sleep 5
             restart-computer
