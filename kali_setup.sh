@@ -1,32 +1,23 @@
 #!/bin/bash
 
-if [ $(id -u) -ne 0 ]; then
-	echo "Please run as root"
-	exit
-fi
+# Check if the script is run as root
+[ $(id -u) -eq 0 ] || { echo "Please run as root"; exit 1; }
 
-if [ ! -f /opt/pimpmykali/.firstrun ]; then
-    
-    # Get pimpmykali
-    cd /opt
-    git clone https://github.com/Dewalt-arch/pimpmykali
-    cd pimpmykali
+# Variables
+FIRST_RUN_FILE="/opt/pimpmykali/.firstrun"
+PIMPMYKALI_DIR="/opt/pimpmykali"
+PIMPMYKALI_REPO="https://github.com/Dewalt-arch/pimpmykali"
+XFCE_CONFIG_URL="https://raw.githubusercontent.com/Dewalt-arch/pimpmyi3-config/main/xfce4/xfce4-power-manager.xml"
+XFCE_CONFIG_DEST="/root/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-power-manager.xml"
 
-    # Execute pimpmykali several times with different functions
-    echo "k" | ./pimpmykali.sh
-    echo "t" | ./pimpmykali.sh
-    ./pimpmykali.sh --mirrors
-    ./pimpmykali.sh --upgrade
-    ./pimpmykali.sh --root
-
-    # Create file
-    touch /opt/pimpmykali/.firstrun
+# First run actions
+if [ ! -f "$FIRST_RUN_FILE" ]; then
+    git clone "$PIMPMYKALI_REPO" "$PIMPMYKALI_DIR" && cd "$PIMPMYKALI_DIR"
+    for opt in k t; do echo "$opt" | ./pimpmykali.sh; done
+    ./pimpmykali.sh --mirrors --upgrade --root
+    touch "$FIRST_RUN_FILE"
     echo "Reboot the machine and log in as root, then execute this script again."
-    
 else
-    # XFCE Power manager: prevent session locking, etc...
-    wget "https://raw.githubusercontent.com/Dewalt-arch/pimpmyi3-config/main/xfce4/xfce4-power-manager.xml" -O /root/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-power-manager.xml
-    
-    # Remove useless directories in /root
-    rmdir /root/Music ; rmdir /root/Public ; rmdir /root/Templates ; rmdir /root/Videos
+    wget -q "$XFCE_CONFIG_URL" -O "$XFCE_CONFIG_DEST"
+    for DIR in /root/Music /root/Public /root/Templates /root/Videos; do rmdir "$DIR"; done
 fi
