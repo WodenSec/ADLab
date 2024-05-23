@@ -16,7 +16,7 @@ if [ ! -f /opt/pimpmykali/.firstrun ]; then
     echo "k" | ./pimpmykali.sh
     echo "t" | ./pimpmykali.sh
     ./pimpmykali.sh --mirrors
-    ./pimpmykali.sh --upgrade
+    #./pimpmykali.sh --upgrade
     ./pimpmykali.sh --root
 
     # Create file
