@@ -52,8 +52,15 @@
 - Une fois que le DC et PC sont configurés, faire un snapshot des VM
 
 ## Setup Kali
-- Récupérer le script `kali_setup.sh` et le lancer une fois en tant que `root`.
-- Puis redémarrer la VM, se connecter en tant que `root` (sur le login session) et le relancer.
+- Se connecter avec les identifiants `kali` / `kali`
+- Ouvrir un terminal et lancer la command `setxkbmap fr`
+- Lancer la commande `sudo nano /etc/default/keyboard` et changer le `us` en `fr`
+- Lancer la commande `sudo apt update`
+- Lancer les commandes `cd /opt` puis `sudo git clone https://github.com/Dewalt-arch/pimpmykali`
+- Lancer la commande `sudo apt install kali-root-login`
+- Lancer la commande `sudo passwd root` puis choisir un mot de passe pour root
+- Redémarrer la Kali et **se connecter à la session en tant que root**
+- Eteindre et faire un snapshot
 
 
 ## Notes
