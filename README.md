@@ -22,9 +22,9 @@
 - Lancer le DC, installer Windows (choisir Standard & "Expérience de bureau")
 - Choisir l'installation personnalisée, sélectionner le disque et laisser faire l'installation et le redémarrage
 - Entrer le mot de passe `R00tR00t` pour l'utilisateur `Administrateur`
-- Se connecter et installer les VM Tools / Guest Additions puis éteindre
+- Se connecter et installer les VM Tools / Guest Additions puis redémarrer.
 - Ouvrir PowerShell en admin, ensuite taper la commande `powershell -ep bypass`
-- Récupérer le script `Set-DC01` et le "dot-source" avec la commande `. .\Set-DC01.ps1`
+- Récupérer le script `Set-DC01`, se placer dans le répertoire contenant le script et lancer la commande `. .\Set-DC01.ps1`
 - Lancer la fonction `Invoke-DCSetup`
 - Le script va redémarrer le serveur. Il faut le relancer en utilisant les mêmes commandes un deuxième fois.
 - Ensuite, le serveur va de nouveau redémarrer. Cette fois il faut se connecter avec le compte `Administrateur` dans le domain `WODENSEC.local` et relancer le script une dernière fois.
