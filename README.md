@@ -30,11 +30,21 @@
 - Ensuite, le serveur va de nouveau redémarrer. Cette fois il faut se connecter avec le compte `Administrateur` dans le domain `WODENSEC.local` et relancer le script une dernière fois.
 
 #### Configuration manuelle sur le DC
+
 - Aller dans `Utilisateurs et ordinateurs Active Directory`
 - Dans `Affichage`, cliquer sur `Fonctionnalités avancées`
 - Cliquer droit sur `WODENSEC.local` dans l'arborescence et cliquer `Propriétés`
 - Dans l'onglet `Sécurité`, `Ajouter...` ajouter le groupe `Backup`
 - Sélectionner le groupe `Backup` et Autoriser les permissions `Réplication de toutes les modifications de l'annuaire`, `Réplication des changements de répertoire` et `Réplication des changements de répertoires dans un ensemble filtré`
+
+- Cliquer sur Démarrer et chercher "cert" puis cliquer sur `Autorité de certification`
+- Dérouler la liste sous `WODENSEC-DC01-CA` puis faire clic-droit sur `Modèles de certificats` et cliquer sur `Gérer`
+- Clic-droit sur le modèle `Utilisateur` puis `Dupliquer le modèle`
+- Dans l'onglet `Général` donner le nom `VPNCert` au modèle
+- Dans l'onglet `Nom du sujet` cliquer sur `Fournir dans la demande`
+- Cliquer sur `Appliquer` puis `OK`
+- Revenir sur la fenête d'autorité de certification (certsrv) et faire clic-droit sur `Modèles de certificats` > `Nouveau` > `Modèle de certificat à délivrer`
+- Dans la liste choisir `VPNCert` puis `OK`
 
 ### Setup des PC
 - Une fois le DC configuré, lancer le PC et installer Windows
