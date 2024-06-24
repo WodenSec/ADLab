@@ -31,12 +31,14 @@
 
 #### Configuration manuelle sur le DC
 
+##### Ajout de permissions
 - Aller dans `Utilisateurs et ordinateurs Active Directory`
 - Dans `Affichage`, cliquer sur `Fonctionnalités avancées`
 - Cliquer droit sur `WODENSEC.local` dans l'arborescence et cliquer `Propriétés`
 - Dans l'onglet `Sécurité`, `Ajouter...` ajouter le groupe `Backup`
 - Sélectionner le groupe `Backup` et Autoriser les permissions `Réplication de toutes les modifications de l'annuaire`, `Réplication des changements de répertoire` et `Réplication des changements de répertoires dans un ensemble filtré`
 
+##### Ajout d'un template de certificat
 - Cliquer sur Démarrer et chercher "cert" puis cliquer sur `Autorité de certification`
 - Dérouler la liste sous `WODENSEC-DC01-CA` puis faire clic-droit sur `Modèles de certificats` et cliquer sur `Gérer`
 - Clic-droit sur le modèle `Utilisateur` puis `Dupliquer le modèle`
