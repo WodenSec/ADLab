@@ -211,14 +211,6 @@ function Add-ServerContent{
     Add-ADGroupMember -Identity "IT" -Members scormier,mlaurens
     Add-ADGroupMember -Identity "Admins du domaine" -Members adm-scormier,adm-mlaurens
 
-    # ACL dangereuses pour IT
-    $DomainAdmins = Get-ADGroup "Admins du domaine"
-    $acl = Get-Acl "AD:$($DomainAdmins.DistinguishedName)"
-    $ITGroup = Get-ADGroup "IT"
-    $ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule($ITGroup.SID, "GenericAll", "Allow")
-    $acl.AddAccessRule($ace)
-    Set-Acl "AD:$($DomainAdmins.DistinguishedName)" $acl
-
     # Quelques comptes désactivés
     New-ADUser -Name "Arnaud Trottier" -GivenName "Arnaud" -Surname "Trottier" -SamAccountName "atrottier" -Description "Désactivé le 14/06/2023" -UserPrincipalName "atrottier@wodensec.local" -Path "OU=vente,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "E&JqMU8725Lq" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
     New-ADUser -Name "Guillaume Brazier" -GivenName "Guillaume" -Surname "Brazier" -SamAccountName "gbrazier" -Description "Désactivé le 25/08/2023" -UserPrincipalName "gbrazier@wodensec.local" -Path "OU=consultants,DC=wodensec,DC=local" -AccountPassword (ConvertTo-SecureString "2JqMU5LqE&87" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
@@ -236,30 +228,6 @@ function Add-ServerContent{
     setspn -A DomainController/svc-sql.wodensec.local:`60111 wodensec\svc-sql > $null
 
     Get-ADUser -Identity "svc-legacy" | Set-ADAccountControl -DoesNotRequirePreAuth:$true
-
-    
-    # ACL vers svc-backup
-    $IdentityReferenceLegacy = New-Object System.Security.Principal.NTAccount("WODENSEC.LOCAL\svc-legacy")
-    $IdentityReferenceSQL = New-Object System.Security.Principal.NTAccount("WODENSEC.LOCAL\svc-sql")
-    $user = Get-ADUser 'svc-backup' -Properties DistinguishedName
-    
-    # Obtenir et préparer les ACL pour l'utilisateur désactivé
-    $acl = Get-Acl "AD:$($user.DistinguishedName)"
-    $adRights = [System.DirectoryServices.ActiveDirectoryRights]::WriteProperty
-    $accessControlType = [System.Security.AccessControl.AccessControlType]::Allow
-    $objectType = New-Object Guid "bf967a68-0de6-11d0-a285-00aa003049e2" # GUID for the 'userAccountControl' property
-    $inheritanceType = [System.DirectoryServices.ActiveDirectorySecurityInheritance]::None
-    
-    # Créer la règle d'accès pour svc-legacy
-    $aceLegacy = New-Object System.DirectoryServices.ActiveDirectoryAccessRule($IdentityReferenceLegacy, $adRights, $accessControlType, $objectType, $inheritanceType)
-    # Créer la règle d'accès pour svc-sql
-    $aceSQL = New-Object System.DirectoryServices.ActiveDirectoryAccessRule($IdentityReferenceSQL, $adRights, $accessControlType, $objectType, $inheritanceType)
-    
-    # Appliquer la règle ACL
-    $acl.AddAccessRule($aceLegacy)
-    $acl.AddAccessRule($aceSQL)
-    Set-Acl -Path "AD:$($user.DistinguishedName)" -AclObject $acl
-
 
     # Share
     mkdir C:\Share
