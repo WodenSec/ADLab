@@ -22,28 +22,22 @@ function Set-IPAddress {
 
 function Nuke-Defender{
 
-    $preferencesToDisable = @(
-        "DisableRealtimeMonitoring",
-        "DisableRemovableDriveScanning",
-        "DisableArchiveScanning",
-        "DisableAutoExclusions",
-        "DisableBehaviorMonitoring",
-        "DisableBlockAtFirstSeen",
-        "DisableCatchupFullScan",
-        "DisableCatchupQuickScan",
-        "DisableEmailScanning",
-        "DisableIntrusionPreventionSystem",
-        "DisableIOAVProtection",
-        "DisablePrivacyMode",
-        "DisableRestorePoint",
-        "DisableScanningMappedNetworkDrivesForFullScan",
-        "DisableScanningNetworkFiles",
-        "DisableScriptScanning"
-    )
-    foreach ($preference in $preferencesToDisable) {
-        Set-MpPreference -$preference $true | Out-Null
-    }
-
+    Set-MpPreference -DisableRealtimeMonitoring $true | Out-Null
+    Set-MpPreference -DisableRemovableDriveScanning $true | Out-Null
+    Set-MpPreference -DisableArchiveScanning  $true | Out-Null
+    Set-MpPreference -DisableAutoExclusions  $true | Out-Null
+    Set-MpPreference -DisableBehaviorMonitoring  $true | Out-Null
+    Set-MpPreference -DisableBlockAtFirstSeen $true | Out-Null
+    Set-MpPreference -DisableCatchupFullScan  $true | Out-Null
+    Set-MpPreference -DisableCatchupQuickScan $true | Out-Null
+    Set-MpPreference -DisableEmailScanning $true | Out-Null
+    Set-MpPreference -DisableIntrusionPreventionSystem  $true | Out-Null
+    Set-MpPreference -DisableIOAVProtection  $true | Out-Null
+    Set-MpPreference -DisablePrivacyMode  $true | Out-Null
+    Set-MpPreference -DisableRestorePoint  $true | Out-Null
+    Set-MpPreference -DisableScanningMappedNetworkDrivesForFullScan  $true | Out-Null
+    Set-MpPreference -DisableScanningNetworkFiles  $true | Out-Null
+    Set-MpPreference -DisableScriptScanning $true | Out-Null
 
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /f /v EnableLUA /t REG_DWORD /d 0 > $null
     reg add "HKLM\System\CurrentControlSet\Services\SecurityHealthService" /v "Start" /t REG_DWORD /d "4" /f > $null  
