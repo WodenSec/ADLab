@@ -108,7 +108,7 @@ function Add-User{
     )
 
     $mdp = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String($mdp))
-    New-ADUser -Name "$prenom $nom" -GivenName "$prenom" -Surname "$nom" -SamAccountName "$sam" -UserPrincipalName "$sam@nevagroup.local" -Path "OU=$ou,DC=nevagroup,DC=local" -AccountPassword (ConvertTo-SecureString $mdp -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
+    New-ADUser -Name "$prenom $nom" -GivenName "$prenom" -Surname "$nom" -SamAccountName "$sam" -UserPrincipalName "$sam@nevasec.local" -Path "OU=$ou,DC=nevasec,DC=local" -AccountPassword (ConvertTo-SecureString $mdp -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
 }
 
 function Build-Server{
@@ -118,11 +118,11 @@ function Build-Server{
     write-host("`n  [++] Importing Module ActiveDirectory")
     Import-Module ActiveDirectory -WarningAction SilentlyContinue | Out-Null
 
-    write-host("`n  [++] Installation du domaine: nevagroup.local ")
-    Install-ADDSDomain -SkipPreChecks -ParentDomainName nevagroup -NewDomainName local -NewDomainNetbiosName nevagroup -InstallDns -SafeModeAdministratorPassword (Convertto-SecureString -AsPlainText "R00tR00t" -Force) -Force -WarningAction SilentlyContinue | Out-Null
+    write-host("`n  [++] Installation du domaine: nevasec.local ")
+    Install-ADDSDomain -SkipPreChecks -ParentDomainName nevasec -NewDomainName local -NewDomainNetbiosName nevasec -InstallDns -SafeModeAdministratorPassword (Convertto-SecureString -AsPlainText "R00tR00t" -Force) -Force -WarningAction SilentlyContinue | Out-Null
 
-    write-host("`n  [++] Déploiement de la forêt AD dans nevagroup.local")
-    Install-ADDSForest -SkipPreChecks -CreateDnsDelegation:$false -DatabasePath "C:\Windows\NTDS" -DomainMode "WinThreshold" -DomainName "nevagroup.local" -DomainNetbiosName "nevagroup" -ForestMode "WinThreshold" -InstallDns:$true -LogPath "C:\Windows\NTDS" -NoRebootOnCompletion:$false -SysvolPath "C:\Windows\SYSVOL" -Force:$true -SafeModeAdministratorPassword (Convertto-SecureString -AsPlainText "R00tR00t" -Force) -WarningAction SilentlyContinue | Out-Null
+    write-host("`n  [++] Déploiement de la forêt AD dans nevasec.local")
+    Install-ADDSForest -SkipPreChecks -CreateDnsDelegation:$false -DatabasePath "C:\Windows\NTDS" -DomainMode "WinThreshold" -DomainName "nevasec.local" -DomainNetbiosName "nevasec" -ForestMode "WinThreshold" -InstallDns:$true -LogPath "C:\Windows\NTDS" -NoRebootOnCompletion:$false -SysvolPath "C:\Windows\SYSVOL" -Force:$true -SafeModeAdministratorPassword (Convertto-SecureString -AsPlainText "R00tR00t" -Force) -WarningAction SilentlyContinue | Out-Null
 
 }
 
@@ -143,7 +143,7 @@ function Add-ServerContent{
     write-host("`n  [++] Installation de RSAT-ADCS et RSAT-ADCS-Management")
     Add-WindowsFeature RSAT-ADCS,RSAT-ADCS-mgmt -WarningAction SilentlyContinue | Out-Null
 
-    Set-ADDefaultDomainPasswordPolicy -Identity "nevagroup.local" -ComplexityEnabled $false
+    Set-ADDefaultDomainPasswordPolicy -Identity "nevasec.local" -ComplexityEnabled $false
 
     # Groupes, OUs, utilisateurs
     New-ADGroup -name "RH" -GroupScope Global
@@ -153,15 +153,15 @@ function Add-ServerContent{
     New-ADGroup -name "IT" -GroupScope Global
     New-ADGroup -name "Backup" -GroupScope Global
 
-    New-ADOrganizationalUnit -Name "Groupes" -Path "DC=nevagroup,DC=local"
-    New-ADOrganizationalUnit -Name "RH" -Path "DC=nevagroup,DC=local"
-    New-ADOrganizationalUnit -Name "Management" -Path "DC=nevagroup,DC=local"
-    New-ADOrganizationalUnit -Name "Consultants" -Path "DC=nevagroup,DC=local"
-    New-ADOrganizationalUnit -Name "Vente" -Path "DC=nevagroup,DC=local"
-    New-ADOrganizationalUnit -Name "IT" -Path "DC=nevagroup,DC=local"
-    New-ADOrganizationalUnit -Name "SVC" -Path "DC=nevagroup,DC=local"
+    New-ADOrganizationalUnit -Name "Groupes" -Path "DC=nevasec,DC=local"
+    New-ADOrganizationalUnit -Name "RH" -Path "DC=nevasec,DC=local"
+    New-ADOrganizationalUnit -Name "Management" -Path "DC=nevasec,DC=local"
+    New-ADOrganizationalUnit -Name "Consultants" -Path "DC=nevasec,DC=local"
+    New-ADOrganizationalUnit -Name "Vente" -Path "DC=nevasec,DC=local"
+    New-ADOrganizationalUnit -Name "IT" -Path "DC=nevasec,DC=local"
+    New-ADOrganizationalUnit -Name "SVC" -Path "DC=nevasec,DC=local"
 
-    foreach ($g in Get-ADGroup -Filter *){ Get-ADGroup $g | Move-ADObject -targetpath "OU=Groupes,DC=nevagroup,DC=local" | Out-Null }
+    foreach ($g in Get-ADGroup -Filter *){ Get-ADGroup $g | Move-ADObject -targetpath "OU=Groupes,DC=nevasec,DC=local" | Out-Null }
 
     # Management
     Add-User -prenom "Richard" -nom "Cuvillier" -sam "rcuvillier" -ou "management" -mdp "TgBlAHYAYQBnAHIAbwB1AHAAMQAyADMA"
@@ -206,20 +206,20 @@ function Add-ServerContent{
     Add-ADGroupMember -Identity "Admins du domaine" -Members adm-scormier,adm-mlaurens
 
     # Quelques comptes désactivés
-    New-ADUser -Name "Arnaud Trottier" -GivenName "Arnaud" -Surname "Trottier" -SamAccountName "atrottier" -Description "Désactivé le 14/06/2023" -UserPrincipalName "atrottier@nevagroup.local" -Path "OU=vente,DC=nevagroup,DC=local" -AccountPassword (ConvertTo-SecureString "Hello123" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
-    New-ADUser -Name "Guillaume Brazier" -GivenName "Guillaume" -Surname "Brazier" -SamAccountName "gbrazier" -Description "Désactivé le 25/08/2023" -UserPrincipalName "gbrazier@nevagroup.local" -Path "OU=consultants,DC=nevagroup,DC=local" -AccountPassword (ConvertTo-SecureString "Summer2024" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
+    New-ADUser -Name "Arnaud Trottier" -GivenName "Arnaud" -Surname "Trottier" -SamAccountName "atrottier" -Description "Désactivé le 14/06/2023" -UserPrincipalName "atrottier@nevasec.local" -Path "OU=vente,DC=nevasec,DC=local" -AccountPassword (ConvertTo-SecureString "Hello123" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
+    New-ADUser -Name "Guillaume Brazier" -GivenName "Guillaume" -Surname "Brazier" -SamAccountName "gbrazier" -Description "Désactivé le 25/08/2023" -UserPrincipalName "gbrazier@nevasec.local" -Path "OU=consultants,DC=nevasec,DC=local" -AccountPassword (ConvertTo-SecureString "Summer2024" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
 
     # Comptes de service et SPN
-    New-ADUser -Name "testuser" -GivenName "test" -Surname "user" -SamAccountName "testuser" -Description "Utilisateur test" -UserPrincipalName "testuser@nevagroup.local" -Path "OU=SVC,DC=nevagroup,DC=local" -AccountPassword (ConvertTo-SecureString "testuser" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    New-ADUser -Name "svc-sql" -GivenName "svc" -Surname "sql" -SamAccountName "svc-sql" -Description "Compte de service SQL" -UserPrincipalName "svc-sql@nevagroup.local" -Path "OU=SVC,DC=nevagroup,DC=local" -AccountPassword (ConvertTo-SecureString "sql0v3-u" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount -PassThru  | Out-Null
-    New-ADUser -Name "svc-backup" -GivenName "svc" -Surname "backup" -SamAccountName "svc-backup" -Description "Compte de service backup. Mdp: B4ckup-S3rv1c3" -UserPrincipalName "svc-backup@nevagroup.local" -Path "OU=SVC,DC=nevagroup,DC=local" -AccountPassword (ConvertTo-SecureString "B4ckup-S3rv1c3" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
-    New-ADUser -Name "svc-legacy" -GivenName "svc" -Surname "legacy" -SamAccountName "svc-legacy" -Description "Compte de service pour app legacy" -UserPrincipalName "svc-legacy@nevagroup.local" -Path "OU=SVC,DC=nevagroup,DC=local" -AccountPassword (ConvertTo-SecureString "Killthislegacy!" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
+    New-ADUser -Name "testuser" -GivenName "test" -Surname "user" -SamAccountName "testuser" -Description "Utilisateur test" -UserPrincipalName "testuser@nevasec.local" -Path "OU=SVC,DC=nevasec,DC=local" -AccountPassword (ConvertTo-SecureString "testuser" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
+    New-ADUser -Name "svc-sql" -GivenName "svc" -Surname "sql" -SamAccountName "svc-sql" -Description "Compte de service SQL" -UserPrincipalName "svc-sql@nevasec.local" -Path "OU=SVC,DC=nevasec,DC=local" -AccountPassword (ConvertTo-SecureString "sql0v3-u" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount -PassThru  | Out-Null
+    New-ADUser -Name "svc-backup" -GivenName "svc" -Surname "backup" -SamAccountName "svc-backup" -Description "Compte de service backup. Mdp: B4ckup-S3rv1c3" -UserPrincipalName "svc-backup@nevasec.local" -Path "OU=SVC,DC=nevasec,DC=local" -AccountPassword (ConvertTo-SecureString "B4ckup-S3rv1c3" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
+    New-ADUser -Name "svc-legacy" -GivenName "svc" -Surname "legacy" -SamAccountName "svc-legacy" -Description "Compte de service pour app legacy" -UserPrincipalName "svc-legacy@nevasec.local" -Path "OU=SVC,DC=nevasec,DC=local" -AccountPassword (ConvertTo-SecureString "Killthislegacy!" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
     
     Add-ADGroupMember -Identity "Backup" -Members svc-backup
 
-    setspn -A NEVAGROUP-DC/svc-sql.nevagroup.local:`60111 nevagroup\svc-sql > $null
-    setspn -A svc-sql/nevagroup.local nevagroup\svc-sql > $null
-    setspn -A DomainController/svc-sql.nevagroup.local:`60111 nevagroup\svc-sql > $null
+    setspn -A nevasec-DC/svc-sql.nevasec.local:`60111 nevasec\svc-sql > $null
+    setspn -A svc-sql/nevasec.local nevasec\svc-sql > $null
+    setspn -A DomainController/svc-sql.nevasec.local:`60111 nevasec\svc-sql > $null
 
     Get-ADUser -Identity "svc-legacy" | Set-ADAccountControl -DoesNotRequirePreAuth:$true
 
@@ -228,7 +228,7 @@ function Add-ServerContent{
     New-SmbShare -Name "Share" -Path "C:\Share" -ChangeAccess "Utilisateurs" -FullAccess "Tout le monde" -WarningAction SilentlyContinue | Out-Null
 
     # For Passback attack
-    Invoke-WebRequest -Uri "https://github.com/nevagroup/ADLab/raw/main/LdapAdminPortable.zip" -OutFile "C:\Share\LdapAdminPortable.zip"
+    Invoke-WebRequest -Uri "https://github.com/nevasec/ADLab/raw/main/LdapAdminPortable.zip" -OutFile "C:\Share\LdapAdminPortable.zip"
 
     # Creating and configuring Custom GPO
     Write-Host("`n  [++] Creation of Custom GPO")
@@ -245,13 +245,13 @@ function Add-ServerContent{
     Set-GPRegistryValue -Name "CustomGPO" -Key "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters\" -ValueName "DisabledComponents" -Value 0x20 -Type Dword  # Prefer IPv4 over IPv6
 
     # GPP password
-    New-Item "\\NEVAGROUP-DC\sysvol\nevagroup.local\Policies\Groups.xml" -ItemType File -Value ([System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String("PAA/AHgAbQBsACAAdgBlAHIAcwBpAG8AbgA9ACIAMQAuADAAIgAgAGUAbgBjAG8AZABpAG4AZwA9ACIAdQB0AGYALQA4ACIAIAA/AD4ADQAKADwARwByAG8AdQBwAHMAIABjAGwAcwBpAGQAPQAiAHsAZQAxADgAYgBkADMAMABiAC0AYwA3AGIAZAAtAGMAOQA5AGYALQA3ADgAYgBiAC0AMgAwADYAYgA0ADMANABkADAAYgAwADgAfQAiAD4ADQAKAAkAPABVAHMAZQByACAAYwBsAHMAaQBkAD0AIgB7AEQARgA1AEYAMQA4ADUANQAtADUAMQBFADUALQA0AGQAMgA0AC0AOABCADEAQQAtAEQAOQBCAEQARQA5ADgAQgBBADEARAAxAH0AIgAgAG4AYQBtAGUAPQAiAEEAZABtAGkAbgBpAHMAdAByAGEAdABvAHIAIAAoAGIAdQBpAGwAdAAtAGkAbgApACIAIABpAG0AYQBnAGUAPQAiADIAIgAgAGMAaABhAG4AZwBlAGQAPQAiADIAMAAxADUALQAwADIALQAxADgAIAAwADEAOgA1ADMAOgAwADEAIgAgAHUAaQBkAD0AIgB7AEQANQBGAEUANwAzADUAMgAtADgAMQBFADEALQA0ADIAQQAyAC0AQgA3AEQAQQAtADEAMQA4ADQAMAAyAEIARQA0AEMAMwAzAH0AIgA+AA0ACgAJAAkAPABQAHIAbwBwAGUAcgB0AGkAZQBzACAAYQBjAHQAaQBvAG4APQAiAFUAIgAgAG4AZQB3AE4AYQBtAGUAPQAiACIAIABmAHUAbABsAE4AYQBtAGUAPQAiACIAIABkAGUAcwBjAHIAaQBwAHQAaQBvAG4APQAiACIAIABjAHAAYQBzAHMAdwBvAHIAZAA9ACIAUgBJADEAMwAzAEIAMgBXAGwAMgBDAGkASQAwAEMAYQB1ADEARAB0AHIAdABUAGUAMwB3AGQARgB3AHoAQwBpAFcAQgA1AFAAUwBBAHgAWABNAEQAcwB0AGMAaABKAHQAMwBiAEwAMABVAGkAZQAwAEIAYQBaAC8ANwByAGQAUQBqAHUAZwBUAG8AbgBGADMAWgBXAEEASwBhADEAaQBSAHYAZAA0AEoARwBRACIAIABjAGgAYQBuAGcAZQBMAG8AZwBvAG4APQAiADAAIgAgAG4AbwBDAGgAYQBuAGcAZQA9ACIAMAAiACAAbgBlAHYAZQByAEUAeABwAGkAcgBlAHMAPQAiADAAIgAgAGEAYwBjAHQARABpAHMAYQBiAGwAZQBkAD0AIgAwACIAIABzAHUAYgBBAHUAdABoAG8AbgB0AHkAPQAiAFIASQBEAF8AQQBEAE0ASQBOACIAIAB1AHMAZQByAE4AYQBtAGUAPQAiAGkAbgBzAHQAYQBsAGwAcABjACIALwA+AA0ACgAJADwALwBVAHMAZQByAD4ADQAKADwALwBHAHIAbwB1AHAAcwA+AA==")))
+    New-Item "\\nevasec-DC\sysvol\nevasec.local\Policies\Groups.xml" -ItemType File -Value ([System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String("PAA/AHgAbQBsACAAdgBlAHIAcwBpAG8AbgA9ACIAMQAuADAAIgAgAGUAbgBjAG8AZABpAG4AZwA9ACIAdQB0AGYALQA4ACIAIAA/AD4ADQAKADwARwByAG8AdQBwAHMAIABjAGwAcwBpAGQAPQAiAHsAZQAxADgAYgBkADMAMABiAC0AYwA3AGIAZAAtAGMAOQA5AGYALQA3ADgAYgBiAC0AMgAwADYAYgA0ADMANABkADAAYgAwADgAfQAiAD4ADQAKAAkAPABVAHMAZQByACAAYwBsAHMAaQBkAD0AIgB7AEQARgA1AEYAMQA4ADUANQAtADUAMQBFADUALQA0AGQAMgA0AC0AOABCADEAQQAtAEQAOQBCAEQARQA5ADgAQgBBADEARAAxAH0AIgAgAG4AYQBtAGUAPQAiAEEAZABtAGkAbgBpAHMAdAByAGEAdABvAHIAIAAoAGIAdQBpAGwAdAAtAGkAbgApACIAIABpAG0AYQBnAGUAPQAiADIAIgAgAGMAaABhAG4AZwBlAGQAPQAiADIAMAAxADUALQAwADIALQAxADgAIAAwADEAOgA1ADMAOgAwADEAIgAgAHUAaQBkAD0AIgB7AEQANQBGAEUANwAzADUAMgAtADgAMQBFADEALQA0ADIAQQAyAC0AQgA3AEQAQQAtADEAMQA4ADQAMAAyAEIARQA0AEMAMwAzAH0AIgA+AA0ACgAJAAkAPABQAHIAbwBwAGUAcgB0AGkAZQBzACAAYQBjAHQAaQBvAG4APQAiAFUAIgAgAG4AZQB3AE4AYQBtAGUAPQAiACIAIABmAHUAbABsAE4AYQBtAGUAPQAiACIAIABkAGUAcwBjAHIAaQBwAHQAaQBvAG4APQAiACIAIABjAHAAYQBzAHMAdwBvAHIAZAA9ACIAUgBJADEAMwAzAEIAMgBXAGwAMgBDAGkASQAwAEMAYQB1ADEARAB0AHIAdABUAGUAMwB3AGQARgB3AHoAQwBpAFcAQgA1AFAAUwBBAHgAWABNAEQAcwB0AGMAaABKAHQAMwBiAEwAMABVAGkAZQAwAEIAYQBaAC8ANwByAGQAUQBqAHUAZwBUAG8AbgBGADMAWgBXAEEASwBhADEAaQBSAHYAZAA0AEoARwBRACIAIABjAGgAYQBuAGcAZQBMAG8AZwBvAG4APQAiADAAIgAgAG4AbwBDAGgAYQBuAGcAZQA9ACIAMAAiACAAbgBlAHYAZQByAEUAeABwAGkAcgBlAHMAPQAiADAAIgAgAGEAYwBjAHQARABpAHMAYQBiAGwAZQBkAD0AIgAwACIAIABzAHUAYgBBAHUAdABoAG8AbgB0AHkAPQAiAFIASQBEAF8AQQBEAE0ASQBOACIAIAB1AHMAZQByAE4AYQBtAGUAPQAiAGkAbgBzAHQAYQBsAGwAcABjACIALwA+AA0ACgAJADwALwBVAHMAZQByAD4ADQAKADwALwBHAHIAbwB1AHAAcwA+AA==")))
  
 }
 
 
-function Invoke-DCSetup{
-    if($env:COMPUTERNAME -ne "NEVAGROUP-DC" ){
+function Invoke-LabSetup{
+    if($env:COMPUTERNAME -ne "nevasec-DC" ){
         Write-Host("Première execution détectée. Changement des paramètres réseau...")
         Set-IPAddress
         Write-Host("Suppression de l'antivirus...")
@@ -261,11 +261,11 @@ function Invoke-DCSetup{
         Get-QoL
         Write-Host("Le serveur va être renommé puis redémarrer")
         Start-Sleep -Seconds 5
-        Rename-Computer -NewName "NEVAGROUP-DC" -Restart
-    }elseif($env:USERDNSDOMAIN -ne "nevagroup.LOCAL"){
+        Rename-Computer -NewName "nevasec-DC" -Restart
+    }elseif($env:USERDNSDOMAIN -ne "nevasec.LOCAL"){
         Write-Host("Deuxieme execution detectee. Installation des roles...")
         Build-Server
-    }elseif($env:COMPUTERNAME -eq "NEVAGROUP-DC" -and $env:USERDNSDOMAIN -eq "nevagroup.LOCAL"){
+    }elseif($env:COMPUTERNAME -eq "nevasec-DC" -and $env:USERDNSDOMAIN -eq "nevasec.LOCAL"){
         Write-Host("Troisieme execution detectee. Ajout du contenu...")
         Add-ServerContent
 
