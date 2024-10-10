@@ -130,11 +130,8 @@ function Add-ServerContent{
 
     write-host("`n  [++] Installation de Remote System Administration Tools (RSAT)")
     Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0 -WarningAction SilentlyContinue | Out-Null
-
-    write-host("`n  [++] Installation de RSAT-ADCS et RSAT-ADCS-Management")
     Add-WindowsFeature RSAT-ADCS,RSAT-ADCS-mgmt -WarningAction SilentlyContinue | Out-Null
-
-    Set-ADDefaultDomainPasswordPolicy -Identity "nevasec.local" -ComplexityEnabled $false
+    Add-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
 
     # Groupes, OUs, utilisateurs
     New-ADGroup -name "RH" -GroupScope Global
@@ -247,7 +244,7 @@ function Invoke-LabSetup{
         Set-IPAddress
         Write-Host("Suppression de l'antivirus...")
         Nuke-Defender
-        Add-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
+
         Write-Host("Changement QoL")
         Get-QoL
         Write-Host("Le serveur va être renommé puis redémarrer")
