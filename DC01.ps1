@@ -111,11 +111,8 @@ function Build-Server{
 
     write-host("`n  [++] Importing Module ActiveDirectory")
     Import-Module ActiveDirectory -WarningAction SilentlyContinue | Out-Null
-
-    write-host("`n  [++] Installation du domaine: nevasec.local ")
-    Install-ADDSDomain -SkipPreChecks -ParentDomainName nevasec -NewDomainName local -NewDomainNetbiosName nevasec -InstallDns -SafeModeAdministratorPassword (Convertto-SecureString -AsPlainText "R00tR00t" -Force) -Force -WarningAction SilentlyContinue | Out-Null
-
-    write-host("`n  [++] Déploiement de la forêt AD dans nevasec.local")
+    
+    write-host("`n  [++] Installation du domaine nevasec.local")
     Install-ADDSForest -SkipPreChecks -CreateDnsDelegation:$false -DatabasePath "C:\Windows\NTDS" -DomainMode "WinThreshold" -DomainName "nevasec.local" -DomainNetbiosName "nevasec" -ForestMode "WinThreshold" -InstallDns:$true -LogPath "C:\Windows\NTDS" -NoRebootOnCompletion:$false -SysvolPath "C:\Windows\SYSVOL" -Force:$true -SafeModeAdministratorPassword (Convertto-SecureString -AsPlainText "R00tR00t" -Force) -WarningAction SilentlyContinue | Out-Null
 
 }
