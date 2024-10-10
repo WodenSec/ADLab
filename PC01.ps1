@@ -13,8 +13,6 @@ function Nuke-Defender{
     Set-MpPreference -DisableIntrusionPreventionSystem  $true | Out-Null
     Set-MpPreference -DisableIOAVProtection  $true | Out-Null
     Set-MpPreference -DisablePrivacyMode  $true | Out-Null
-    Set-MpPreference -DisableRealtimeMonitoring  $true | Out-Null
-    Set-MpPreference -DisableRemovableDriveScanning  $true | Out-Null
     Set-MpPreference -DisableRestorePoint  $true | Out-Null
     Set-MpPreference -DisableScanningMappedNetworkDrivesForFullScan  $true | Out-Null
     Set-MpPreference -DisableScanningNetworkFiles  $true | Out-Null
@@ -48,17 +46,10 @@ function Nuke-Defender{
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "LocalAccountTokenFilterPolicy" /t REG_DWORD /d "1" /f > $null
 
     Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False | Out-Null
-    Get-NetFirewallRule -Group '@FirewallAPI.dll,-32752'|Set-NetFirewallRule -Profile 'Private, Domain' -Enabled true -PassThru|select Name,DisplayName,Enabled,Profile |ft -a | Out-Null
-    netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow > $null
-    netsh advfirewall firewall add rule name="ICMP Allow incoming V6 echo request" protocol=icmpv6:8,any dir=in action=allow > $nul
-    Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False | Out-Null
     
     # SMB signing enabled but not required
     reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters" /v "RequireSecuritySignature" /t REG_DWORD /d "0" /f > $null
     reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" /v "requiresecuritysignature" /t REG_DWORD /d "0" /f > $null
-    # PrintNightmare
-    # reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "NoWarningNoElevationOnInstall" /t REG_DWORD /d "1" /f > $null
-    # reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" /v "RestrictDriverInstallationToAdministrators" /t REG_DWORD /d "0" /f > $null
 
     Get-WmiObject -query "Select HotFixID  from Win32_QuickFixengineering" | sort-object -Descending -Property HotFixID|%{
     $sUpdate=$_.HotFixID.Replace("KB","")
@@ -70,11 +61,12 @@ function Nuke-Defender{
 }
 
 
-function Invoke-PC01Setup { 
+function Invoke-LabSetup { 
 
     if ($env:COMPUTERNAME -ne "PC01") { 
         write-host ("`n Changement des paramètres IP et du nom et reboot...")
 
+        Nuke-Defender
         $NetAdapter=Get-CimInstance -Class Win32_NetworkAdapter -Property NetConnectionID,NetConnectionStatus | Where-Object { $_.NetConnectionStatus -eq 2 } | Select-Object -Property NetConnectionID -ExpandProperty NetConnectionID
         $IPAddress=Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias $NetAdapter | Select-Object -ExpandProperty IPAddress
         $IPByte = $IPAddress.Split(".")
@@ -86,16 +78,16 @@ function Invoke-PC01Setup {
         Rename-Computer -NewName "PC01" -Restart
 
     }
-    elseif ($env:COMPUTERNAME -eq "PC01" -and $env:USERDNSDOMAIN -ne "WODENSEC.LOCAL") {
-        write-host ("`n Suppression de l'antivirus, ajout au domaine et reboot...")
+    elseif ($env:COMPUTERNAME -eq "PC01" -and $env:USERDNSDOMAIN -ne "NEVASEC.LOCAL") {
+        write-host ("`n Ajout au domaine et reboot...")
         
         Nuke-Defender
-        $domain = "WODENSEC"
+        $domain = "NEVASEC"
         $password = "R00tR00t" | ConvertTo-SecureString -asPlainText -Force
         $username = "$domain\Administrateur" 
         $credential = New-Object System.Management.Automation.PSCredential($username,$password)
         #Verif ping du domaine avant lancement de la connection
-        if (Test-Connection -ComputerName "WODENSEC.local" -Count 5 -Quiet) { 
+        if (Test-Connection -ComputerName "NEVASEC.local" -Count 5 -Quiet) { 
             Add-Computer -DomainName $domain -Credential $credential  | Out-Null
             Start-Sleep 5
             restart-computer
