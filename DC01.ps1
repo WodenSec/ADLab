@@ -216,7 +216,7 @@ function Add-ServerContent{
     New-SmbShare -Name "Share" -Path "C:\Share" -ChangeAccess "Utilisateurs" -FullAccess "Tout le monde" -WarningAction SilentlyContinue | Out-Null
 
     # For Passback attack
-    Invoke-WebRequest -Uri "https://github.com/nevasec/ADLab/raw/main/LdapAdminPortable.zip" -OutFile "C:\Share\LdapAdminPortable.zip"
+    Invoke-WebRequest -Uri "https://github.com/WodenSec/ADLab/raw/main/LdapAdminPortable.zip" -OutFile "C:\Share\LdapAdminPortable.zip"
 
     # Creating and configuring Custom GPO
     Write-Host("`n  [++] Creation of Custom GPO")
