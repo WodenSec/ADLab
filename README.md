@@ -9,7 +9,7 @@
 - Récupérer les ISO **EN FRANCAIS**
   - [Windows 10 Enterprise](https://www.microsoft.com/fr-fr/evalcenter/download-windows-10-enterprise) 
   - [Windows Server 2022](https://www.microsoft.com/fr-fr/evalcenter/download-windows-server-2022)
-- Créer les VM dans un hyperviseur en les nommant DC01, PC01 & PC02.
+- Créer les VM dans un hyperviseur en les nommant DC01, SRV01 & PC01.
   - Pour VirtualBox, ajouter le fichier ISO. **Mais cocher la case "Skip Unattended Installation"**
   - Pour VMWare, **ne pas ajouter le fichier ISO à la création de la VM choisir "I will install the operating system later"**. Puis ajouter l'ISO dans le lecteur CD quand la VM est créée.
 - Configuration des VM
@@ -22,26 +22,20 @@
     - VMWare: Custom (VMNet8)
  
 ### Setup du DC
-- Allumer la VM DC01, installer Windows (choisir **Standard & "Expérience de bureau"**)
-- Choisir l'installation personnalisée, sélectionner le disque et laisser faire l'installation et le redémarrage
-- Utiliser le mot de passe `R00tR00t` pour l'utilisateur `Administrateur`
-- Se connecter et installer les VM Tools / Guest Additions puis redémarrer.
-- Récupérer le script `Set-DC01`
--   Pour cela, ouvrir l'URL suivante : https://raw.githubusercontent.com/WodenSec/ADLab/main/Set-DC01.ps1
--   Copier l'intégralité du script puis le coller dans un fichier sur le DC. Renommer ce fichier en `Set-DC01.ps1`
-- Ouvrir PowerShell en admin, ensuite taper la commande `powershell -ep bypass`
-- Se placer dans le répertoire contenant le script et lancer la commande `. .\Set-DC01.ps1`
-- Lancer la fonction `Invoke-DCSetup`
-- Le script va faire redémarrer le serveur.
-- Refaire les commandes pour executer le script. C'est à dire:
-  - Ouvrir PowerShell en admin, ensuite taper la commande `powershell -ep bypass`
-  - Se placer dans le répertoire contenant le script et lancer la commande `. .\Set-DC01.ps1`
-  - Lancer la fonction `Invoke-DCSetup`
-- Ensuite, le serveur va de nouveau redémarrer. Cette fois il faut se connecter avec le compte `Administrateur` dans le domain `WODENSEC.local` et relancer le script une dernière fois en faisant les mêmes 3 étapes citées plus haut.
+1. Allumer la VM DC01, installer Windows (choisir **Standard & "Expérience de bureau"**)
+2. Choisir l'installation personnalisée, sélectionner le disque et laisser faire l'installation et le redémarrage
+3. Utiliser le mot de passe `R00tR00t` pour l'utilisateur `Administrateur`
+4. Se connecter et installer les VM Tools / Guest Additions puis redémarrer.
+5. Ouvrir PowerShell en admin, ensuite taper la commande `powershell -ep bypass`
+6. Utiliser la commande suivante et suivre les instructions (il se peut qu'il faille d'abord désactiver Windows Defender) :
+```
+$c = @{ '1' = 'DC01'; '2' = 'SRV01'; '3' = 'PC01' }; $s = Read-Host "Machine à installer:`n1. Contrôleur de domaine (DC01)`n2. Serveur (SRV01)`n3. Client (PC01)`nEntrez votre choix (1/2/3):"; if ($c.ContainsKey($s)) { (iwr -useb ("https://raw.githubusercontent.com/WodenSec/ADLab/main/" + $c[$s] + ".ps1")) | iex; Invoke-LabSetup } else { Write-Host "Choix invalide." }
+```
+7. Le script va faire redémarrer le serveur.
+8. Répéter les étapes 5 & 6
+9. Le serveur va de nouveau redémarrer. Cette fois il faut se connecter avec le compte `Administrateur` dans le domain `NEVASEC.LOCAL` et relancer le script une dernière fois en suivant les étapes 5 & 6.
 
-```
-$c = @{ '1' = 'DC01'; '2' = 'SRV01'; '3' = 'CLT01' }; $s = Read-Host "Machine à installer:`n1. Contrôleur de domaine (DC01)`n2. Serveur (SRV01)`n3. Client (CLT01)`nEntrez votre choix (1/2/3):"; if ($c.ContainsKey($s)) { (iwr -useb ("https://raw.githubusercontent.com/WodenSec/ADLab/main/" + $c[$s] + ".ps1")) | iex; Invoke-LabSetup } else { Write-Host "Choix invalide." }
-```
+
 
 #### Configuration manuelle sur le DC
 
@@ -50,13 +44,13 @@ Une fois que le script a été executé trois fois, il faut faire quelques confi
 ##### Ajout de permissions
 - Aller dans `Utilisateurs et ordinateurs Active Directory`
 - Dans `Affichage`, cliquer sur `Fonctionnalités avancées`
-- Cliquer droit sur `WODENSEC.local` dans l'arborescence et cliquer `Propriétés`
+- Cliquer droit sur `NEVASEC.local` dans l'arborescence et cliquer `Propriétés`
 - Dans l'onglet `Sécurité`, `Ajouter...` ajouter le groupe `Backup`
 - Sélectionner le groupe `Backup` et Autoriser les permissions `Réplication de toutes les modifications de l'annuaire`, `Réplication des changements de répertoire` et `Réplication des changements de répertoires dans un ensemble filtré`
 
 ##### Ajout d'un template de certificat
 - Cliquer sur Démarrer et chercher "cert" puis cliquer sur `Autorité de certification`
-- Dérouler la liste sous `WODENSEC-DC01-CA` puis faire clic-droit sur `Modèles de certificats` et cliquer sur `Gérer`
+- Dérouler la liste sous `NEVASEC-DC01-CA` puis faire clic-droit sur `Modèles de certificats` et cliquer sur `Gérer`
 - Clic-droit sur le modèle `Utilisateur` puis `Dupliquer le modèle`
 - Dans l'onglet `Général` donner le nom `VPNCert` au modèle
 - Dans l'onglet `Nom du sujet` cliquer sur `Fournir dans la demande`
