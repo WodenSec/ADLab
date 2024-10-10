@@ -149,7 +149,7 @@ function Add-ServerContent{
     New-ADOrganizationalUnit -Name "IT" -Path "DC=nevasec,DC=local"
     New-ADOrganizationalUnit -Name "SVC" -Path "DC=nevasec,DC=local"
 
-    foreach ($g in Get-ADGroup -Filter *){ Get-ADGroup $g | Move-ADObject -targetpath "OU=Groupes,DC=nevasec,DC=local" | Out-Null }
+    foreach ($g in Get-ADGroup -Filter *){ Get-ADGroup $g | Move-ADObject -targetpath "OU=Groupes,DC=nevasec,DC=local" -ErrorAction SilentlyContinue | Out-Null }
 
     # Management
     Add-User -prenom "Richard" -nom "Cuvillier" -sam "rcuvillier" -ou "management" -mdp "TgBlAHYAYQBnAHIAbwB1AHAAMQAyADMA"
