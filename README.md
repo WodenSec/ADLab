@@ -40,7 +40,7 @@
 - Ensuite, le serveur va de nouveau redémarrer. Cette fois il faut se connecter avec le compte `Administrateur` dans le domain `WODENSEC.local` et relancer le script une dernière fois en faisant les mêmes 3 étapes citées plus haut.
 
 ```
-$c = @{ '1' = 'nevagroup-dc'; '2' = 'nevasec-dc'; '3' = 'srv-app' }; $s = Read-Host "Machine à installer:`n1. DC racine (nevagroup-dc)`n2. DC sous-domaine (nevasec-dc)`n3. Serveur standard (srv-app)`nEntrez votre choix (1/2/3):"; if ($c.ContainsKey($s)) { (iwr -useb ("https://raw.githubusercontent.com/WodenSec/ADLab/main/" + $c[$s] + ".ps1")) | iex; Invoke-LabSetup } else { Write-Host "Choix invalide." }
+$c = @{ '1' = 'DC01'; '2' = 'SRV01'; '3' = 'CLT01' }; $s = Read-Host "Machine à installer:`n1. Contrôleur de domaine (DC01)`n2. Serveur (SRV01)`n3. Client (CLT01)`nEntrez votre choix (1/2/3):"; if ($c.ContainsKey($s)) { (iwr -useb ("https://raw.githubusercontent.com/WodenSec/ADLab/main/" + $c[$s] + ".ps1")) | iex; Invoke-LabSetup } else { Write-Host "Choix invalide." }
 ```
 
 #### Configuration manuelle sur le DC
