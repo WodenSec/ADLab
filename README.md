@@ -39,6 +39,10 @@
   - Lancer la fonction `Invoke-DCSetup`
 - Ensuite, le serveur va de nouveau redémarrer. Cette fois il faut se connecter avec le compte `Administrateur` dans le domain `WODENSEC.local` et relancer le script une dernière fois en faisant les mêmes 3 étapes citées plus haut.
 
+```
+$c = @{ '1' = 'nevagroup-dc'; '2' = 'nevasec-dc'; '3' = 'srv-app' }; $s = Read-Host "Machine à installer:`n1. DC racine (nevagroup-dc)`n2. DC sous-domaine (nevasec-dc)`n3. Serveur standard (srv-app)`nEntrez votre choix (1/2/3):"; if ($c.ContainsKey($s)) { (iwr -useb ("https://raw.githubusercontent.com/WodenSec/ADLab/main/" + $c[$s] + ".ps1")) | iex; Invoke-LabSetup } else { Write-Host "Choix invalide." }
+```
+
 #### Configuration manuelle sur le DC
 
 Une fois que le script a été executé trois fois, il faut faire quelques configurations.
