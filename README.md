@@ -105,8 +105,8 @@ $c = @{ '1' = 'DC01'; '2' = 'SRV01'; '3' = 'PC01' }; $s = Read-Host "Machine à 
 ```
 $c = @{ '1' = 'DC01'; '2' = 'SRV01'; '3' = 'PC01' }; $s = Read-Host "Machine à installer:`n1. Contrôleur de domaine (DC01)`n2. Serveur (SRV01)`n3. Client (PC01)`nEntrez votre choix (1/2/3):"; if ($c.ContainsKey($s)) { (iwr -useb ("https://raw.githubusercontent.com/WodenSec/ADLab/main/" + $c[$s] + ".ps1")) | iex; Invoke-LabSetup } else { Write-Host "Choix invalide." }
 ````
-- Le script va redémarrer l'ordinateur une fois. Il faut relancer le script. (Deux exécutions au total)
-- Une fois que l'ordinateur a de nouveau redémarré, vérifier qu'il est possible de se connecter via un compte du domaine.
+- Le script va redémarrer l'ordinateur une fois. Il faut relancer le script ci-dessus.
+- Une fois que le serveur a de nouveau redémarré, se connecter avec l'Administrateur du domaine puis relancer le script.
 
 
 ### Snapshots
