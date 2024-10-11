@@ -2,11 +2,16 @@
 
 ## Mise en place du lab Active Directory
 
-**LIRE ATTENTIVEMENT TOUTES LES ÉTAPES AVANT DE COMMENCER.**
-**NE FAITES PAS D'ACTIONS MANUELLES TELLES QUE RENOMMER LES MACHINES OU AJOUTER DES RÔLES.**
+**LIRE ATTENTIVEMENT TOUTES LES ÉTAPES AVANT DE COMMENCER.**  
+**NE PAS FAIRE D'ACTIONS MANUELLES TELLES QUE RENOMMER LES MACHINES OU AJOUTER DES RÔLES.**
+
+### Vue générale
+
+![Schéma lab](adlab.png)
+
 
 ### Création des VM
-- Récupérer les ISO **EN FRANCAIS**
+- Télécharger les ISO **EN FRANCAIS**
   - [Windows 10 Enterprise](https://www.microsoft.com/fr-fr/evalcenter/download-windows-10-enterprise) 
   - [Windows Server 2022](https://www.microsoft.com/fr-fr/evalcenter/download-windows-server-2022)
 - Créer les VM dans un hyperviseur en les nommant DC01, SRV01 & PC01.
@@ -58,7 +63,7 @@ Une fois que le script a été executé trois fois, il faut faire quelques confi
 - Revenir sur la fenête d'autorité de certification (certsrv) et faire clic-droit sur `Modèles de certificats` > `Nouveau` > `Modèle de certificat à délivrer`
 - Dans la liste choisir `VPNCert` puis `OK`
 
-### Autre
+#### Autre
 
 - Ouvrir PowerShell en tant qu'admin
 - Récupérer tout le contenu du fichier à l'URL suivante : https://raw.githubusercontent.com/WodenSec/ADLab/main/fix.txt
@@ -66,8 +71,8 @@ Une fois que le script a été executé trois fois, il faut faire quelques confi
 - Le contenu est encodé en base64 pour ne pas vous spoiler des vecteurs d'attaque ;)
 
 
-### Setup du PC
-- Une fois le DC configuré, lancer le PC et installer Windows
+### Setup de SRV01
+- Une fois le DC configuré, installer Windows sur SRV01 et PC01
 - Sélectionner "Joindre le domaine à la place" pour la création du compte.
 - Utiliser les login/mdp suivants pour l'utilisateur local: `localadmin` / `Sysadmin123!`
 - Installer les VM Tools / Guest Additions puis redémarrer
@@ -77,6 +82,19 @@ Une fois que le script a été executé trois fois, il faut faire quelques confi
 $c = @{ '1' = 'DC01'; '2' = 'SRV01'; '3' = 'PC01' }; $s = Read-Host "Machine à installer:`n1. Contrôleur de domaine (DC01)`n2. Serveur (SRV01)`n3. Client (PC01)`nEntrez votre choix (1/2/3):"; if ($c.ContainsKey($s)) { (iwr -useb ("https://raw.githubusercontent.com/WodenSec/ADLab/main/" + $c[$s] + ".ps1")) | iex; Invoke-LabSetup } else { Write-Host "Choix invalide." }
 ````
 - Le script va redémarrer l'ordinateur une fois. Il faut relancer le script à nouveau.
+
+### Setup de PC01
+- Une fois le DC configuré, installer Windows sur SRV01 et PC01
+- Sélectionner "Joindre le domaine à la place" pour la création du compte.
+- Utiliser les login/mdp suivants pour l'utilisateur local: `localadmin` / `Sysadmin123!`
+- Installer les VM Tools / Guest Additions puis redémarrer
+- Ouvrir PowerShell en admin, ensuite taper la commande `powershell -ep bypass`
+- Utiliser la commande suivante et suivre les instructions (il se peut qu'il faille d'abord désactiver Windows Defender) :
+```
+$c = @{ '1' = 'DC01'; '2' = 'SRV01'; '3' = 'PC01' }; $s = Read-Host "Machine à installer:`n1. Contrôleur de domaine (DC01)`n2. Serveur (SRV01)`n3. Client (PC01)`nEntrez votre choix (1/2/3):"; if ($c.ContainsKey($s)) { (iwr -useb ("https://raw.githubusercontent.com/WodenSec/ADLab/main/" + $c[$s] + ".ps1")) | iex; Invoke-LabSetup } else { Write-Host "Choix invalide." }
+````
+- Le script va redémarrer l'ordinateur une fois. Il faut relancer le script à nouveau.
+
 
 ### Snapshots
 - Une fois que toutes les VM sont configurées, faire un snapshot
