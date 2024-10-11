@@ -37,24 +37,16 @@ function Invoke-LabSetup {
         }
     }
     else { # Create credentials file
+        write-host ("`n Configuration finale...")
+        
         $username = 'NEVASEC\mlaurens'
         $password = ConvertTo-SecureString '!0Nevagrup0!' -AsPlainText -Force
         $credential = New-Object System.Management.Automation.PSCredential -ArgumentList $username, $password
         $credential | Export-CliXml -Path "C:\secure_credentials.xml"
         
         # Create the PowerShell script to perform LLMNR trigger
-        $scriptContent = @'
-        while ($true) {
-            # Import stored credentials
-            $credential = Import-CliXml -Path "C:\secure_credentials.xml"
-        
-            # LLMNR trigger
-            Start-Process -FilePath "powershell.exe" -ArgumentList "-Command ls \\SQL01\C$" -Credential $credential
-        
-            # Sleep for 2 minutes before repeating
-            Start-Sleep -Seconds 120
-        }
-        '@
+        $scriptContent = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String("dwBoAGkAbABlACAAKAAkAHQAcgB1AGUAKQAgAHsACgAgACAAJABjAHIAZQBkAGUAbgB0AGkAYQBsACAAPQAgAEkAbQBwAG8AcgB0AC0AQwBsAGkAWABtAGwAIAAtAFAAYQB0AGgAIAAiAEMAOgBcAHMAZQBjAHUAcgBlAF8AYwByAGUAZABlAG4AdABpAGEAbABzAC4AeABtAGwAIgAKACAAIABTAHQAYQByAHQALQBQAHIAbwBjAGUAcwBzACAALQBGAGkAbABlAFAAYQB0AGgAIAAiAHAAbwB3AGUAcgBzAGgAZQBsAGwALgBlAHgAZQAiACAALQBBAHIAZwB1AG0AZQBuAHQATABpAHMAdAAgACIALQBDAG8AbQBtAGEAbgBkACAAbABzACAAXABcAFMAUQBMADAAMQBcAEMAJAAiACAALQBDAHIAZQBkAGUAbgB0AGkAYQBsACAAJABjAHIAZQBkAGUAbgB0AGkAYQBsAAoAIAAgAFMAdABhAHIAdAAtAFMAbABlAGUAcAAgAC0AUwBlAGMAbwBuAGQAcwAgADEAMgAwAAoAfQA="))
+
         
         $scriptPath = "C:\llmnr_trigger.ps1"
         $scriptContent | Set-Content -Path $scriptPath
@@ -63,6 +55,9 @@ function Invoke-LabSetup {
         if (-not (Test-Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run")) {
             New-Item -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Force
         }
-        Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "LLMNR_Trigger_Script" -Value "powershell.exe -ExecutionPolicy Bypass -NoProfile -File `"$scriptPath`"" }
+        Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "LLMNR_Trigger_Script" -Value "powershell.exe -ExecutionPolicy Bypass -NoProfile -File `"$scriptPath`"" 
         New-LocalUser -Name srvadmin -Password (ConvertTo-SecureString "Super-Password-4-Admin" -AsPlainText -Force)
+        Add-LocalGroupMember -Group 'Utilisateurs du Bureau à distance' -Member 'NEVASEC\Admins du domaine'
+        Add-LocalGroupMember -Group 'Utilisateurs du Bureau à distance' -Member 'NEVASEC\IT'    
+    }     
 } 
