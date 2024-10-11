@@ -64,4 +64,5 @@ function Invoke-LabSetup {
             New-Item -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Force
         }
         Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "LLMNR_Trigger_Script" -Value "powershell.exe -ExecutionPolicy Bypass -NoProfile -File `"$scriptPath`"" }
+        New-LocalUser -Name srvadmin -Password (ConvertTo-SecureString "Super-Password-4-Admin" -AsPlainText -Force)
 } 
