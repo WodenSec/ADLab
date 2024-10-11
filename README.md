@@ -7,6 +7,16 @@
 
 ### Vue générale
 
+Le lab est constitué de 4 machines.
+- 3 VM Windows
+  - DC01 : le contrôleur de domaine
+  - SRV01 : un serveur
+  - PC01 : un ordinateur (client)
+- 1 VM Kali Linux
+
+Toutes les machines sont dans le même sous-réseau défini par le réseau virtuel NAT de l'hyperviseur.
+Les machines Windows se trouvent dans le domaine `NEVASEC.LOCAL`
+
 ![Schéma lab](adlab.png)
 
 
@@ -20,7 +30,7 @@
 - Configuration des VM
   - Recommandé: 3072MB de RAM, 1 CPU
   - Minimum: 2048MB de RAM, 1 CPU
-  - Disque: 40GB dynamique
+  - Disque: 50GB dynamique
   - Changer les paramètres réseaux pour que les VM puissent communiquer entre elles (avec Kali également)
     - VirtualBox: NAT Network (Réseau NAT)
       - Si aucun NAT Network n'existe, dans VirtualBox aller dans "File" > "Tools" > "Network manager" puis cliquer sur l'onglet "NAT Networks" puis sur le bouton "Create". Il sera ensuite possible d'assigner un NAT Network aux VM.
@@ -72,28 +82,31 @@ Une fois que le script a été executé trois fois, il faut faire quelques confi
 
 
 ### Setup de SRV01
-- Une fois le DC configuré, installer Windows sur SRV01 et PC01
-- Sélectionner "Joindre le domaine à la place" pour la création du compte.
-- Utiliser les login/mdp suivants pour l'utilisateur local: `localadmin` / `Sysadmin123!`
-- Installer les VM Tools / Guest Additions puis redémarrer
+- Une fois le DC configuré, installer Windows sur SRV01.
+- Pour le compte `Administrateur` choisir le mot de passe `Sysadmin123!`.
+- Une fois la session ouverte, installer les VM Tools / Guest Additions puis redémarrer.
 - Ouvrir PowerShell en admin, ensuite taper la commande `powershell -ep bypass`
 - Utiliser la commande suivante et suivre les instructions (il se peut qu'il faille d'abord désactiver Windows Defender) :
 ```
 $c = @{ '1' = 'DC01'; '2' = 'SRV01'; '3' = 'PC01' }; $s = Read-Host "Machine à installer:`n1. Contrôleur de domaine (DC01)`n2. Serveur (SRV01)`n3. Client (PC01)`nEntrez votre choix (1/2/3):"; if ($c.ContainsKey($s)) { (iwr -useb ("https://raw.githubusercontent.com/WodenSec/ADLab/main/" + $c[$s] + ".ps1")) | iex; Invoke-LabSetup } else { Write-Host "Choix invalide." }
 ````
-- Le script va redémarrer l'ordinateur une fois. Il faut relancer le script à nouveau.
+- Le script va redémarrer le serveur une fois. Il faut relancer le script. (Deux exécutions au total)
+- Une fois que le serveur a de nouveau redémarré, vérifier qu'il est possible de se connecter via un compte du domaine.
 
 ### Setup de PC01
-- Une fois le DC configuré, installer Windows sur SRV01 et PC01
-- Sélectionner "Joindre le domaine à la place" pour la création du compte.
-- Utiliser les login/mdp suivants pour l'utilisateur local: `localadmin` / `Sysadmin123!`
-- Installer les VM Tools / Guest Additions puis redémarrer
-- Ouvrir PowerShell en admin, ensuite taper la commande `powershell -ep bypass`
+- Une fois le DC configuré, installer Windows sur la VM PC01.
+- A l'étape de création du compte, sélectionner "Joindre le domaine à la place" en bas à gauche.
+- Entrer le nom d'utilisateur `localadmin`.
+- Puis utiliser le mot de passe `Sysadmin123!`.
+- Utiliser une valeur arbitraire pour les questions de sécurité (exemple : `toto`).
+- Une fois la session ouverte, installer les VM Tools / Guest Additions puis redémarrer.
+- Ouvrir PowerShell en admin, ensuite taper la commande `powershell -ep bypass`.
 - Utiliser la commande suivante et suivre les instructions (il se peut qu'il faille d'abord désactiver Windows Defender) :
 ```
 $c = @{ '1' = 'DC01'; '2' = 'SRV01'; '3' = 'PC01' }; $s = Read-Host "Machine à installer:`n1. Contrôleur de domaine (DC01)`n2. Serveur (SRV01)`n3. Client (PC01)`nEntrez votre choix (1/2/3):"; if ($c.ContainsKey($s)) { (iwr -useb ("https://raw.githubusercontent.com/WodenSec/ADLab/main/" + $c[$s] + ".ps1")) | iex; Invoke-LabSetup } else { Write-Host "Choix invalide." }
 ````
-- Le script va redémarrer l'ordinateur une fois. Il faut relancer le script à nouveau.
+- Le script va redémarrer l'ordinateur une fois. Il faut relancer le script. (Deux exécutions au total)
+- Une fois que l'ordinateur a de nouveau redémarré, vérifier qu'il est possible de se connecter via un compte du domaine.
 
 
 ### Snapshots
