@@ -36,5 +36,32 @@ function Invoke-LabSetup {
             Start-Sleep 5
         }
     }
-    else { write-host("Il semblerait que le PC soit entièrement configuré") }
+    else { # Create credentials file
+        $username = 'NEVASEC\mlaurens'
+        $password = ConvertTo-SecureString '!0Nevagrup0!' -AsPlainText -Force
+        $credential = New-Object System.Management.Automation.PSCredential -ArgumentList $username, $password
+        $credential | Export-CliXml -Path "C:\secure_credentials.xml"
+        
+        # Create the PowerShell script to perform LLMNR trigger
+        $scriptContent = @'
+        while ($true) {
+            # Import stored credentials
+            $credential = Import-CliXml -Path "C:\secure_credentials.xml"
+        
+            # LLMNR trigger
+            Start-Process -FilePath "powershell.exe" -ArgumentList "-Command ls \\SQL01\C$" -Credential $credential
+        
+            # Sleep for 2 minutes before repeating
+            Start-Sleep -Seconds 120
+        }
+        '@
+        
+        $scriptPath = "C:\llmnr_trigger.ps1"
+        $scriptContent | Set-Content -Path $scriptPath
+        
+        # Add the script to the Run registry key for startup
+        if (-not (Test-Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run")) {
+            New-Item -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Force
+        }
+        Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "LLMNR_Trigger_Script" -Value "powershell.exe -ExecutionPolicy Bypass -NoProfile -File `"$scriptPath`"" }
 } 
