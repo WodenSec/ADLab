@@ -76,9 +76,7 @@ Une fois que le script a été executé trois fois, il faut faire quelques confi
 #### Autre
 
 - Ouvrir PowerShell en tant qu'admin
-- Récupérer tout le contenu du fichier à l'URL suivante : https://raw.githubusercontent.com/WodenSec/ADLab/main/fix.txt
-- Le coller et l'exécuter
-- Le contenu est encodé en base64 pour ne pas vous spoiler des vecteurs d'attaque ;)
+- Lancer la commande suivante : `Get-ADComputer -Identity SRV01 | Set-ADAccountControl -TrustedForDelegation $true`
 
 
 ### Setup de SRV01
