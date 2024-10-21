@@ -73,12 +73,6 @@ Une fois que le script a été executé trois fois, il faut faire quelques confi
 - Revenir sur la fenête d'autorité de certification (certsrv) et faire clic-droit sur `Modèles de certificats` > `Nouveau` > `Modèle de certificat à délivrer`
 - Dans la liste choisir `VPNCert` puis `OK`
 
-#### Autre
-
-- Ouvrir PowerShell en tant qu'admin
-- Lancer la commande suivante : `Get-ADComputer -Identity SRV01 | Set-ADAccountControl -TrustedForDelegation $true`
-
-
 ### Setup de SRV01
 - Une fois le DC configuré, installer Windows sur SRV01.
 - Pour le compte `Administrateur` choisir le mot de passe `Sysadmin123!`.
@@ -104,14 +98,19 @@ $c = @{ '1' = 'DC01'; '2' = 'SRV01'; '3' = 'PC01' }; $s = Read-Host "Machine à 
 $c = @{ '1' = 'DC01'; '2' = 'SRV01'; '3' = 'PC01' }; $s = Read-Host "Machine à installer:`n1. Contrôleur de domaine (DC01)`n2. Serveur (SRV01)`n3. Client (PC01)`nEntrez votre choix (1/2/3):"; if ($c.ContainsKey($s)) { (iwr -useb ("https://raw.githubusercontent.com/WodenSec/ADLab/main/" + $c[$s] + ".ps1")) | iex; Invoke-LabSetup } else { Write-Host "Choix invalide." }
 ````
 - Le script va redémarrer l'ordinateur une fois. Il faut relancer le script ci-dessus.
-- Une fois que le serveur a de nouveau redémarré, se connecter avec l'Administrateur du domaine puis relancer le script.
+
+### Finalisation config DC01
+
+- Se connecter à DC01
+- Ouvrir PowerShell en tant qu'admin
+- Lancer la commande suivante : `Get-ADComputer -Identity SRV01 | Set-ADAccountControl -TrustedForDelegation $true`
 
 
 ### Snapshots
 - Une fois que toutes les VM sont configurées, faire un snapshot
 
 ## Setup Kali
-- Importer la Kali en double cliquant sur le fichier `.ova` pour VirtualBox et `.vmx` pour VMWare
+- Importer la Kali en double cliquant sur le fichier `.vbox` pour VirtualBox et `.vmx` pour VMWare
 - Changer la carte réseau en l'attribuant au NAT Network pour VirtualBox ou Custom (VMNet8) pour VMWare
 - Se connecter avec les identifiants `kali` / `kali`
 - Ouvrir un terminal et lancer la command `setxkbmap fr`
