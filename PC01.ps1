@@ -96,5 +96,9 @@ function Invoke-LabSetup {
             Start-Sleep 5
         }
     }
-    else { write-host("Il semblerait que le PC soit entièrement configuré") }
+    else {
+        $group = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String("VQB0AGkAbABpAHMAYQB0AGUAdQByAHMAIABkAHUAIABCAHUAcgBlAGEAdQAgAOAAIABkAGkAcwB0AGEAbgBjAGUA"))
+        Add-LocalGroupMember -Group $group -Member 'NEVASEC\Admins du domaine'
+        Add-LocalGroupMember -Group $group -Member 'NEVASEC\IT'
+    }
 } 
