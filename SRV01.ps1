@@ -58,6 +58,7 @@ function Invoke-LabSetup {
         Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "LLMNR_Trigger_Script" -Value "powershell.exe -ExecutionPolicy Bypass -NoProfile -File `"$scriptPath`"" 
         New-LocalUser -Name srvadmin -Password (ConvertTo-SecureString "Super-Password-4-Admin" -AsPlainText -Force)
         Add-LocalGroupMember -Group $group -Member 'NEVASEC\Admins du domaine'
-        Add-LocalGroupMember -Group $group -Member 'NEVASEC\IT'    
+        Add-LocalGroupMember -Group $group -Member 'NEVASEC\IT'
+        Add-LocalGroupMember -Group 'Administrateurs' -Member 'NEVASEC\IT'
     }     
 } 
