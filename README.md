@@ -70,7 +70,8 @@ Une fois que le script a été executé trois fois, il faut faire quelques confi
 - Dans l'onglet `Général` donner le nom `VPNCert` au modèle
 - Dans l'onglet `Nom du sujet` cliquer sur `Fournir dans la demande`
 - Cliquer sur `Appliquer` puis `OK`
-- Revenir sur la fenête d'autorité de certification (certsrv) et faire clic-droit sur `Modèles de certificats` > `Nouveau` > `Modèle de certificat à délivrer`
+- Fermer la fenêtre "Console des modèles de certificat"
+- Sur la fenête "certsrv" restante faire clic-droit sur `Modèles de certificats` > `Nouveau` > `Modèle de certificat à délivrer`
 - Dans la liste choisir `VPNCert` puis `OK`
 
 ### Setup de SRV01
