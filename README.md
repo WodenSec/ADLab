@@ -118,7 +118,6 @@ $c = @{ '1' = 'DC01'; '2' = 'SRV01'; '3' = 'PC01' }; $s = Read-Host "Machine à 
 - Ouvrir un terminal et lancer la command `setxkbmap fr`
 - Lancer la commande `sudo nano /etc/default/keyboard` et changer le `us` en `fr`
 - Lancer la commande `sudo apt update`
-- Lancer les commandes `cd /opt` puis `sudo git clone https://github.com/Dewalt-arch/pimpmykali`
 - Lancer la commande `sudo apt install kali-root-login`
 - Lancer la commande `sudo passwd root` puis choisir un mot de passe pour root
 - Redémarrer la Kali et **se connecter à la session en tant que root**
