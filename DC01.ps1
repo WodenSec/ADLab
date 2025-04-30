@@ -121,20 +121,20 @@ function Add-User{
 }
 
 function Build-Server{
-    write-host("`n  [++] Installation de Active Directory Domain Services (ADDS)")
+    Write-host("`n  [++] Installation de Active Directory Domain Services (ADDS)")
     Install-windowsfeature -name AD-Domain-Services -IncludeManagementTools -WarningAction SilentlyContinue | Out-Null
 
-    write-host("`n  [++] Importing Module ActiveDirectory")
+    Write-host("`n  [++] Importing Module ActiveDirectory")
     Import-Module ActiveDirectory -WarningAction SilentlyContinue | Out-Null
     
-    write-host("`n  [++] Installation du domaine nevasec.local")
+    Write-host("`n  [++] Installation du domaine nevasec.local")
     Install-ADDSForest -SkipPreChecks -CreateDnsDelegation:$false -DatabasePath "C:\Windows\NTDS" -DomainMode "WinThreshold" -DomainName "NEVASEC.LOCAL" -DomainNetbiosName "NEVASEC" -ForestMode "WinThreshold" -InstallDns:$true -LogPath "C:\Windows\NTDS" -NoRebootOnCompletion:$false -SysvolPath "C:\Windows\SYSVOL" -Force:$true -SafeModeAdministratorPassword (Convertto-SecureString -AsPlainText "R00tR00t" -Force) -WarningAction SilentlyContinue | Out-Null
 
 }
 
 function Add-ServerContent{
 
-    write-host("`n  [++] Installation de AD Certificate Services")
+    Write-Host("`n  [++] Installation de AD Certificate Services")
     Add-WindowsFeature -Name AD-Certificate -IncludeManagementTools -WarningAction SilentlyContinue | Out-Null
   
     write-host("`n  [++] Installation de ADCS Certificate Authority")
@@ -216,7 +216,6 @@ function Add-ServerContent{
     New-ADUser -Name "svc-sql" -GivenName "svc" -Surname "sql" -SamAccountName "svc-sql" -Description "Compte de service SQL" -UserPrincipalName "svc-sql@nevasec.local" -Path "OU=SVC,DC=nevasec,DC=local" -AccountPassword (ConvertTo-SecureString "sql0v3-u" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount -PassThru  | Out-Null
     New-ADUser -Name "svc-backup" -GivenName "svc" -Surname "backup" -SamAccountName "svc-backup" -Description "Compte de service backup. Mdp: B4ckup-S3rv1c3" -UserPrincipalName "svc-backup@nevasec.local" -Path "OU=SVC,DC=nevasec,DC=local" -AccountPassword (ConvertTo-SecureString "B4ckup-S3rv1c3" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Out-Null
     New-ADUser -Name "svc-legacy" -GivenName "svc" -Surname "legacy" -SamAccountName "svc-legacy" -Description "Compte de service pour app legacy" -UserPrincipalName "svc-legacy@nevasec.local" -Path "OU=SVC,DC=nevasec,DC=local" -AccountPassword (ConvertTo-SecureString "Killthislegacy!" -AsPlainText -Force) -PasswordNeverExpires $true -PassThru | Enable-ADAccount  | Out-Null
-    
     Add-ADGroupMember -Identity "Backup" -Members svc-backup
 
     setspn -A DC01/svc-sql.nevasec.local:`60111 nevasec\svc-sql > $null
@@ -248,7 +247,6 @@ function Add-ServerContent{
     Set-GPRegistryValue -Name "CustomGPO" -Key "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters\" -ValueName "DisabledComponents" -Value 0x20 -Type Dword  # Prefer IPv4 over IPv6
 
     New-GPLink -Name "CustomGPO" -Target "DC=NEVASEC,DC=local" -LinkEnabled Yes -Enforced Yes
-
     
     # GPP password
     New-Item "\\DC01\sysvol\nevasec.local\Policies\Groups.xml" -ItemType File -Value ([System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String("PAA/AHgAbQBsACAAdgBlAHIAcwBpAG8AbgA9ACIAMQAuADAAIgAgAGUAbgBjAG8AZABpAG4AZwA9ACIAdQB0AGYALQA4ACIAIAA/AD4ADQAKADwARwByAG8AdQBwAHMAIABjAGwAcwBpAGQAPQAiAHsAZQAxADgAYgBkADMAMABiAC0AYwA3AGIAZAAtAGMAOQA5AGYALQA3ADgAYgBiAC0AMgAwADYAYgA0ADMANABkADAAYgAwADgAfQAiAD4ADQAKAAkAPABVAHMAZQByACAAYwBsAHMAaQBkAD0AIgB7AEQARgA1AEYAMQA4ADUANQAtADUAMQBFADUALQA0AGQAMgA0AC0AOABCADEAQQAtAEQAOQBCAEQARQA5ADgAQgBBADEARAAxAH0AIgAgAG4AYQBtAGUAPQAiAEEAZABtAGkAbgBpAHMAdAByAGEAdABvAHIAIAAoAGIAdQBpAGwAdAAtAGkAbgApACIAIABpAG0AYQBnAGUAPQAiADIAIgAgAGMAaABhAG4AZwBlAGQAPQAiADIAMAAxADUALQAwADIALQAxADgAIAAwADEAOgA1ADMAOgAwADEAIgAgAHUAaQBkAD0AIgB7AEQANQBGAEUANwAzADUAMgAtADgAMQBFADEALQA0ADIAQQAyAC0AQgA3AEQAQQAtADEAMQA4ADQAMAAyAEIARQA0AEMAMwAzAH0AIgA+AA0ACgAJAAkAPABQAHIAbwBwAGUAcgB0AGkAZQBzACAAYQBjAHQAaQBvAG4APQAiAFUAIgAgAG4AZQB3AE4AYQBtAGUAPQAiACIAIABmAHUAbABsAE4AYQBtAGUAPQAiACIAIABkAGUAcwBjAHIAaQBwAHQAaQBvAG4APQAiACIAIABjAHAAYQBzAHMAdwBvAHIAZAA9ACIAUgBJADEAMwAzAEIAMgBXAGwAMgBDAGkASQAwAEMAYQB1ADEARAB0AHIAdABUAGUAMwB3AGQARgB3AHoAQwBpAFcAQgA1AFAAUwBBAHgAWABNAEQAcwB0AGMAaABKAHQAMwBiAEwAMABVAGkAZQAwAEIAYQBaAC8ANwByAGQAUQBqAHUAZwBUAG8AbgBGADMAWgBXAEEASwBhADEAaQBSAHYAZAA0AEoARwBRACIAIABjAGgAYQBuAGcAZQBMAG8AZwBvAG4APQAiADAAIgAgAG4AbwBDAGgAYQBuAGcAZQA9ACIAMAAiACAAbgBlAHYAZQByAEUAeABwAGkAcgBlAHMAPQAiADAAIgAgAGEAYwBjAHQARABpAHMAYQBiAGwAZQBkAD0AIgAwACIAIABzAHUAYgBBAHUAdABoAG8AbgB0AHkAPQAiAFIASQBEAF8AQQBEAE0ASQBOACIAIAB1AHMAZQByAE4AYQBtAGUAPQAiAGkAbgBzAHQAYQBsAGwAcABjACIALwA+AA0ACgAJADwALwBVAHMAZQByAD4ADQAKADwALwBHAHIAbwB1AHAAcwA+AA==")))
@@ -270,13 +268,18 @@ function Invoke-LabSetup{
         Write-Host("Deuxieme execution detectee. Installation des roles...")
         Build-Server
     }elseif ($env:COMPUTERNAME -eq "DC01" -and $env:USERDNSDOMAIN -eq "NEVASEC.LOCAL") {
-        # Vérifie si le contenu a déjà été ajouté
-        if (Get-ADUser -Identity "svc-sql" -ErrorAction SilentlyContinue) {
-            Write-Host("Le contenu du lab semble déjà déployé, aucune action supplémentaire.")
-            return
+        $exists = $false
+        try {
+            $user = Get-ADUser -Identity "svc-sql" -ErrorAction Stop
+            $exists = $true
+        } catch {
+            $exists = $false
         }
-        Write-Host("Troisième exécution détectée. Ajout du contenu...")
-        Add-ServerContent
+        if (-not $exists) {
+            # Exécution normale : contenu pas encore déployé
+            Write-Host("Troisieme execution detectee. Ajout du contenu...")
+            Add-ServerContent
+        }
     }
 }
 
