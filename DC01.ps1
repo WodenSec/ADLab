@@ -255,9 +255,17 @@ function Invoke-LabSetup{
     }elseif($env:USERDNSDOMAIN -ne "nevasec.LOCAL"){
         Write-Host("Deuxieme execution detectee. Installation des roles...")
         Build-Server
-    }elseif($env:COMPUTERNAME -eq "DC01" -and $env:USERDNSDOMAIN -eq "NEVASEC.LOCAL"){
-        Write-Host("Troisieme execution detectee. Ajout du contenu...")
+    }elseif ($env:COMPUTERNAME -eq "DC01" -and $env:USERDNSDOMAIN -eq "NEVASEC.LOCAL") {
+        # Vérifie si le contenu a déjà été ajouté
+        if (Get-ADUser -Identity "svc-sql" -ErrorAction SilentlyContinue) {
+            Write-Host("Le contenu du lab semble déjà déployé, aucune action supplémentaire.")
+            return
+        }
+        Write-Host("Troisième exécution détectée. Ajout du contenu...")
         Add-ServerContent
-
     }
 }
+
+
+
+
