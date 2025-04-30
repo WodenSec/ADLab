@@ -273,6 +273,7 @@ function Invoke-LabSetup{
             $user = Get-ADUser -Identity "svc-sql" -ErrorAction Stop
             $exists = $true
         } catch {
+            Write-Host("Tout est deja installe !")
             $exists = $false
         }
         if (-not $exists) {
