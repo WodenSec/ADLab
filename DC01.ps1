@@ -62,20 +62,35 @@ function Nuke-Defender{
     schtasks /Change /TN "Microsoft\Windows\Windows Defender\Windows Defender Cleanup" /Disable > $null
     schtasks /Change /TN "Microsoft\Windows\Windows Defender\Windows Defender Scheduled Scan" /Disable > $null
     schtasks /Change /TN "Microsoft\Windows\Windows Defender\Windows Defender Verification" /Disable > $null
-    reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v "NoAutoUpdate" /t REG_DWORD /d "1" /f > $null
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "LocalAccountTokenFilterPolicy" /t REG_DWORD /d "1" /f > $null
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /f /v sc_fdrespub /t REG_EXPAND_SZ /d "sc config fdrespub depend= RpcSs/http/fdphost/LanmanWorkstation"  # Sets FDResPub service dependency at system startup
+
+    # Désactivation Windows Update
+    Stop-Service wuauserv -Force -ErrorAction SilentlyContinue
+    Set-Service wuauserv -StartupType Disabled
+    Stop-Service bits -Force -ErrorAction SilentlyContinue
+    Set-Service bits -StartupType Disabled
+    Stop-Service dosvc -Force -ErrorAction SilentlyContinue
+    Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\dosvc" -Name "Start" -Value 4
+    takeown /f "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /a /r > $null 2>&1
+    icacls "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /grant administrators:F /t > $null 2>&1
+    New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Force | Out-Null
+    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name NoAutoUpdate -Value 1
   
     # Désactivation du Firewall
     Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False | Out-Null
 
     # Uninstall updates
-    Get-WmiObject -query "Select HotFixID  from Win32_QuickFixengineering" | sort-object -Descending -Property HotFixID|%{
-    $sUpdate=$_.HotFixID.Replace("KB","")
-    write-host ("Uninstalling update "+$sUpdate);
-    & wusa.exe /uninstall /KB:$sUpdate /quiet /norestart;
-    Wait-Process wusa 
-    Start-Sleep -s 1 }
+    Get-WindowsPackage -Online |
+        Where-Object { $_.ReleaseType -eq 'SecurityUpdate' -and $_.PackageState -eq 'Installed' } |
+        ForEach-Object {
+            try {
+                Remove-WindowsPackage -Online -PackageName $_.PackageName -ErrorAction Stop > $null 2>&1
+            } catch {
+                # Erreurs ignorées silencieusement
+            }
+        }
+
 
 }
 
@@ -242,14 +257,13 @@ function Add-ServerContent{
 
 function Invoke-LabSetup{
     if($env:COMPUTERNAME -ne "DC01" ){
-        Write-Host("Première execution détectée. Changement des paramètres réseau...")
+        Write-Host("Premiere execution detectee. Changement des parametres reseau...")
         Set-IPAddress
         Write-Host("Suppression de l'antivirus...")
         Nuke-Defender
-
         Write-Host("Changement QoL")
         Get-QoL
-        Write-Host("Le serveur va être renommé puis redémarrer")
+        Write-Host("Le serveur va etre renomme puis redemarrer")
         Start-Sleep -Seconds 5
         Rename-Computer -NewName "DC01" -Restart
     }elseif($env:USERDNSDOMAIN -ne "nevasec.LOCAL"){
