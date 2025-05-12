@@ -6,6 +6,18 @@ function Invoke-LabSetup {
     
         write-host ("`n Changement des paramètres IP et du nom et reboot...")
 
+        # Désactivation Windows Update
+        Stop-Service wuauserv -Force -ErrorAction SilentlyContinue
+        Set-Service wuauserv -StartupType Disabled
+        Stop-Service bits -Force -ErrorAction SilentlyContinue
+        Set-Service bits -StartupType Disabled
+        Stop-Service dosvc -Force -ErrorAction SilentlyContinue
+        Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\dosvc" -Name "Start" -Value 4
+        takeown /f "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /a /r > $null 2>&1
+        icacls "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /grant administrators:F /t > $null 2>&1
+        New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Force | Out-Null
+        Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name NoAutoUpdate -Value 1
+
         $NetAdapter=Get-CimInstance -Class Win32_NetworkAdapter -Property NetConnectionID,NetConnectionStatus | Where-Object { $_.NetConnectionStatus -eq 2 } | Select-Object -Property NetConnectionID -ExpandProperty NetConnectionID
         $IPAddress=Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias $NetAdapter | Select-Object -ExpandProperty IPAddress
         $IPByte = $IPAddress.Split(".")
