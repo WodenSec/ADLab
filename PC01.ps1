@@ -107,6 +107,7 @@ function Invoke-LabSetup {
         }
     }
     else {
+        write-host ("`n Derniere execution....")
         $group = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String("VQB0AGkAbABpAHMAYQB0AGUAdQByAHMAIABkAHUAIABCAHUAcgBlAGEAdQAgAOAAIABkAGkAcwB0AGEAbgBjAGUA"))
         Add-LocalGroupMember -Group $group -Member 'NEVASEC\Admins du domaine'
         Add-LocalGroupMember -Group $group -Member 'NEVASEC\IT'
